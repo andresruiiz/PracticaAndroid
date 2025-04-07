@@ -21,3 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Practica Android"
 include(":app")
+include(":core")
+include(":data-retrofit")
+include(":domain")

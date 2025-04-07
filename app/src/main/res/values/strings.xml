@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Practica Android</string>
+    <string name="app_name">Práctica Android</string>
+    <string name="facturas">Facturas</string>
+    <string name="smart_solar">Smart Solar</string>
 </resources>

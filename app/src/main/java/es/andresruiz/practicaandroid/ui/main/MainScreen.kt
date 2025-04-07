@@ -14,8 +14,10 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import es.andresruiz.practicaandroid.R
 import es.andresruiz.practicaandroid.navigation.Facturas
 import es.andresruiz.practicaandroid.navigation.SmartSolar
 
@@ -32,7 +34,9 @@ fun MainScreen(
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
-                    Text("Práctica Android")
+                    Text(
+                        text = stringResource(R.string.app_name)
+                    )
                 }
             )
         },
@@ -65,19 +69,17 @@ fun HomeButtons(
                 navController.navigate(Facturas)
             }
         ) {
-            Text("Facturas")
+            Text(
+                text = stringResource(R.string.facturas)
+            )
         }
         Button(
             onClick = {
                 navController.navigate(SmartSolar)
         }) {
-            Text("Smart Solar")
+            Text(
+                text = stringResource(R.string.smart_solar)
+            )
         }
     }
-}
-
-@Preview
-@Composable
-fun MainScreenPreview() {
-
 }

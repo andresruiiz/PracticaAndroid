@@ -22,10 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import es.andresruiz.practicaandroid.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +44,7 @@ fun FacturasScreen(navController: NavController) {
                 ),
                 title = {
                     Text(
-                        "Facturas",
+                        text = stringResource(R.string.facturas),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -75,9 +77,4 @@ fun FacturasScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
-}
-
-@Preview
-@Composable
-fun FacturasPreview() {
 }

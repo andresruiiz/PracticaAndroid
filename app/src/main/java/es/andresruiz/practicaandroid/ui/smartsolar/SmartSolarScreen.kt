@@ -18,9 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import es.andresruiz.practicaandroid.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,7 +40,7 @@ fun SmartSolarScreen(navController: NavController) {
                 ),
                 title = {
                     Text(
-                        "Smart Solar",
+                        text = stringResource(R.string.smart_solar),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

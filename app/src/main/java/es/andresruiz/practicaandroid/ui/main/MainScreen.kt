@@ -3,6 +3,7 @@ package es.andresruiz.practicaandroid.ui.main
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -15,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import es.andresruiz.practicaandroid.R
 import es.andresruiz.practicaandroid.navigation.Facturas
@@ -30,8 +31,8 @@ fun MainScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 title = {
                     Text(
@@ -60,14 +61,16 @@ fun HomeButtons(
     navController: NavController
 ) {
     Column(
-        modifier.fillMaxSize(),
+        modifier.fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
             onClick = {
                 navController.navigate(Facturas)
-            }
+            },
+            modifier.fillMaxWidth()
         ) {
             Text(
                 text = stringResource(R.string.facturas)
@@ -76,7 +79,9 @@ fun HomeButtons(
         Button(
             onClick = {
                 navController.navigate(SmartSolar)
-        }) {
+            },
+            modifier.fillMaxWidth()
+        ) {
             Text(
                 text = stringResource(R.string.smart_solar)
             )

@@ -42,7 +42,7 @@ private val LightColorScheme = lightColorScheme(
 fun PracticaAndroidTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // Dynamic color en falso, si está a true se ponen otros colores
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

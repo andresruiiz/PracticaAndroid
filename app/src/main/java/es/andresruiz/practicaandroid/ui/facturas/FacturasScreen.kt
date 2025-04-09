@@ -1,28 +1,19 @@
 package es.andresruiz.practicaandroid.ui.facturas
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
@@ -49,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import es.andresruiz.practicaandroid.R
 import es.andresruiz.domain.models.Factura
+import es.andresruiz.practicaandroid.navigation.Filtros
 import es.andresruiz.practicaandroid.ui.components.FacturaItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +51,7 @@ fun FacturasScreen(navController: NavController, viewModel: FacturasViewModel = 
     val showDialog = viewModel.showDialog.collectAsState().value
 
     val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+        TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -115,7 +107,7 @@ fun FacturasTopBar(navController: NavController, scrollBehavior: TopAppBarScroll
             }
         },
         actions = {
-            IconButton(onClick = { /* do something */ }) {
+            IconButton(onClick = { navController.navigate(Filtros) }) {
 
                 val icon: Painter = painterResource(id = R.drawable.filtericon_3x)
 

@@ -10,3 +10,6 @@ object Facturas
 
 @Serializable
 object SmartSolar
+
+@Serializable
+object Filtros

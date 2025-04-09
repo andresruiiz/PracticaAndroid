@@ -1,5 +1,6 @@
 package es.andresruiz.practicaandroid.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,8 +23,12 @@ import es.andresruiz.domain.models.Factura
 import es.andresruiz.practicaandroid.R
 
 @Composable
-fun FacturaItem(factura: Factura, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth()) {
+fun FacturaItem(factura: Factura, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

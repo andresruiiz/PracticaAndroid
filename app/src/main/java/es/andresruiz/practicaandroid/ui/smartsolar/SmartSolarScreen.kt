@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,49 +39,12 @@ import es.andresruiz.practicaandroid.R
 @Composable
 fun SmartSolarScreen(navController: NavController) {
     val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+        TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            MediumTopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
-                ),
-                title = {
-                    Text(
-                        text = stringResource(R.string.smart_solar),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 35.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                navigationIcon = {
-                    TextButton(onClick = { navController.popBackStack() }) {
-
-                        val icon: Painter = painterResource(id = R.drawable.ic_arrow_back)
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = icon,
-                                contentDescription = "Botón para volver a consumo",
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .size(20.dp)
-                            )
-                            Text(
-                                "Atrás",
-                                fontSize = 20.sp
-                            )
-                        }
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
+            SmartSolarTopBar(navController, scrollBehavior)
         },
     ) { innerPadding ->
         Column(
@@ -94,4 +58,47 @@ fun SmartSolarScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SmartSolarTopBar(navController: NavController, scrollBehavior: TopAppBarScrollBehavior) {
+    MediumTopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+        ),
+        title = {
+            Text(
+                text = stringResource(R.string.smart_solar),
+                fontWeight = FontWeight.Bold,
+                fontSize = 35.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        navigationIcon = {
+            TextButton(onClick = { navController.popBackStack() }) {
+
+                val icon: Painter = painterResource(id = R.drawable.ic_arrow_back)
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = icon,
+                        contentDescription = "Botón para volver a consumo",
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .size(20.dp)
+                    )
+                    Text(
+                        "Atrás",
+                        fontSize = 20.sp
+                    )
+                }
+            }
+        },
+        scrollBehavior = scrollBehavior
+    )
 }

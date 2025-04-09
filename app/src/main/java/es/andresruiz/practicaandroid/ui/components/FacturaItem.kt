@@ -3,7 +3,6 @@ package es.andresruiz.practicaandroid.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,6 +34,8 @@ fun FacturaItem(factura: Factura, modifier: Modifier = Modifier) {
         ) {
             // Columna de la derecha (Fecha y estado)
             Column(modifier = Modifier.weight(1f)) {
+
+                // Falta darle formato a la fecha
                 Text(
                     text = factura.fecha,
                     style = MaterialTheme.typography.bodyLarge,

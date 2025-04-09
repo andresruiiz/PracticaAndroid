@@ -26,6 +26,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import es.andresruiz.practicaandroid.R
 import es.andresruiz.domain.models.Factura
@@ -43,15 +45,9 @@ import es.andresruiz.practicaandroid.ui.components.FacturaItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturasScreen(navController: NavController) {
+fun FacturasScreen(navController: NavController, viewModel: FacturasViewModel = viewModel()) {
 
-    // Facturas hardcodeadas para probar, luego se cambiará por las reales
-    val facturas = listOf(
-        Factura(descEstado = "Pendiente de pago", importeOrdenacion = 54.56, fecha = "31/08/2020"),
-        Factura(descEstado = "Pendiente de pago", importeOrdenacion = 67.54, fecha = "31/07/2020"),
-        Factura(descEstado = "Pendiente de pago", importeOrdenacion = 56.38, fecha = "22/06/2020"),
-        Factura(descEstado = "Pagada", importeOrdenacion = 57.38, fecha = "31/05/2020")
-    )
+    val facturas = viewModel.facturas.collectAsState().value
 
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())

@@ -142,11 +142,23 @@ fun MiInstalacionScreen() {
 fun EnergiaScreen() {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+            .fillMaxSize()
+            .padding(80.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
+        Image(
+            painter = painterResource(R.drawable.plan_gestiones),
+            contentDescription = "Gráfico de página en mantenimiento",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp),
+            contentScale = ContentScale.Crop
+        )
+
         Text(
-            text = "Energía",
+            text = "Estamos trabajando en mejorar la App. Tus paneles solares siguen produciendo, en breve podrás seguir viendo tu producción solar. Sentimos las molestias.",
+            textAlign = TextAlign.Center
         )
     }
 }

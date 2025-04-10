@@ -1,8 +1,8 @@
 package es.andresruiz.practicaandroid.ui.filtros
 
-import android.app.DatePickerDialog
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,19 +14,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
@@ -36,8 +44,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -55,17 +66,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import es.andresruiz.practicaandroid.R
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltrosScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: FiltrosViewModel = viewModel()
 ) {
 
     var startDate by remember { mutableStateOf("") }
@@ -97,12 +113,7 @@ fun FiltrosScreen(
             verticalArrangement = Arrangement.Top
         ) {
             // Selector de fechas
-            DateFilterSection(
-                startDate = startDate,
-                endDate = endDate,
-                onStartDateChange = { startDate = it },
-                onEndDateChange = { endDate = it }
-            )
+            DateFilterSection(viewModel)
 
             Divider(
                 modifier = Modifier.padding(vertical = 16.dp),
@@ -190,38 +201,12 @@ fun FiltrosTopBar(navController: NavController, scrollBehavior: TopAppBarScrollB
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DateFilterSection(
-    startDate: String,
-    endDate: String,
-    onStartDateChange: (String) -> Unit,
-    onEndDateChange: (String) -> Unit
-) {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance()
+fun DateFilterSection(viewModel: FiltrosViewModel) {
+    val fechaDesde by viewModel.fechaDesde.collectAsState()
+    val fechaHasta by viewModel.fechaHasta.collectAsState()
 
-    val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-
-    val startDatePicker = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
-            onStartDateChange(selectedDate.format(dateFormatter))
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
-
-    val endDatePicker = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
-            onEndDateChange(selectedDate.format(dateFormatter))
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
 
     Text(
         text = "Con fecha de emisión",
@@ -235,33 +220,131 @@ fun DateFilterSection(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Desde
-        OutlinedTextField(
-            value = startDate,
-            onValueChange = {  },
-            readOnly = true,
-            placeholder = { Text("día/mes/año") },
-            modifier = Modifier
-                .weight(1f)
-                .padding(end = 8.dp)
-                .clickable { startDatePicker.show() },
-            colors = TextFieldDefaults.colors(
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Desde:",
+                color = MaterialTheme.colorScheme.secondary,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(bottom = 4.dp)
             )
-        )
+            SimpleDateField(
+                value = fechaDesde,
+                placeholder = "día/mes/año",
+                onClick = { showStartDatePicker = true }
+            )
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
 
         // Hasta
-        OutlinedTextField(
-            value = endDate,
-            onValueChange = {  },
-            readOnly = true,
-            placeholder = { Text("día/mes/año") },
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 8.dp)
-                .clickable { endDatePicker.show() },
-            colors = TextFieldDefaults.colors(
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Hasta:",
+                color = MaterialTheme.colorScheme.secondary,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(bottom = 4.dp)
             )
+            SimpleDateField(
+                value = fechaHasta,
+                placeholder = "día/mes/año",
+                onClick = { showEndDatePicker = true }
+            )
+        }
+    }
+
+    // Selector de fecha "Desde"
+    if (showStartDatePicker) {
+        DatePickerModal(
+            onDateSelected = { millis ->
+                millis?.let {
+                    viewModel.setFechaDesde(convertMillisToDate(it))
+                }
+            },
+            onDismiss = { showStartDatePicker = false }
         )
     }
+
+    // Selector de fecha "Hasta"
+    if (showEndDatePicker) {
+        DatePickerModal(
+            onDateSelected = { millis ->
+                millis?.let {
+                    viewModel.setFechaHasta(convertMillisToDate(it))
+                }
+            },
+            onDismiss = { showEndDatePicker = false }
+        )
+    }
+}
+
+@Composable
+fun SimpleDateField(
+    value: String,
+    placeholder: String,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .background(
+                color = MaterialTheme.colorScheme.secondary,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = if (value.isEmpty()) placeholder else value,
+            color = MaterialTheme.colorScheme.onSecondary
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerModal(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        shape = RectangleShape,
+        confirmButton = {
+            Button(onClick = {
+                onDateSelected(datePickerState.selectedDateMillis)
+                onDismiss()
+            }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text(
+                    text = "Cancelar",
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
+
+fun convertMillisToDate(millis: Long): String {
+    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return formatter.format(Date(millis))
 }
 
 @Composable
@@ -407,7 +490,6 @@ fun CheckboxItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp)
     ) {
         Checkbox(
             checked = isChecked,
@@ -418,8 +500,7 @@ fun CheckboxItem(
             )
         )
         Text(
-            text = text,
-            modifier = Modifier.padding(start = 8.dp)
+            text = text
         )
     }
 }

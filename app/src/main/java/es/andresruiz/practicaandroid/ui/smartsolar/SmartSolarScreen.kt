@@ -1,5 +1,6 @@
 package es.andresruiz.practicaandroid.ui.smartsolar
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -106,14 +108,32 @@ fun SmartSolarScreen(navController: NavController) {
 }
 
 @Composable
-fun DetallesScreen() {
+fun MiInstalacionScreen() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
         Text(
-            text = "Detalles",
+            text = "Aquí tines los datos de tu instalación fotovoltaica en tiempo real.",
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+
+        Row(modifier = Modifier.padding(bottom = 8.dp)) {
+            Text(
+                text = "Autoconsumo: ",
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Text(
+                text = "92%"
+            )
+        }
+
+        Image(
+            painter = painterResource(R.drawable.grafico1),
+            contentDescription = "Gráfico de autoconsumo",
+            modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.Crop
         )
     }
 }
@@ -132,14 +152,14 @@ fun EnergiaScreen() {
 }
 
 @Composable
-fun MiInstalacionScreen() {
+fun DetallesScreen() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
         Text(
-            text = "Mi instalación",
+            text = "Detalles",
         )
     }
 }

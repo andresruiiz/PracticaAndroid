@@ -3,6 +3,7 @@ package es.andresruiz.practicaandroid.ui.smartsolar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,6 +20,7 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -70,17 +74,19 @@ fun SmartSolarScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            TabRow(
+            ScrollableTabRow(
                 selectedTabIndex = selectedTabIndex,
                 containerColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.onBackground,
+                edgePadding = 0.dp,
                 indicator = { tabPositions ->
                     // Indicador negro personalizado
                     TabRowDefaults.SecondaryIndicator(
                         modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
                         color = MaterialTheme.colorScheme.onBackground,
                     )
-                }
+                },
+                divider = {} // Sin línea divisoria inferior
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
@@ -115,7 +121,7 @@ fun MiInstalacionScreen() {
             .padding(16.dp)
     ) {
         Text(
-            text = "Aquí tines los datos de tu instalación fotovoltaica en tiempo real.",
+            text = "Aquí tienes los datos de tu instalación fotovoltaica en tiempo real.",
             modifier = Modifier.padding(bottom = 24.dp)
         )
 

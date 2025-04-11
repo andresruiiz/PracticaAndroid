@@ -3,4 +3,6 @@
     <string name="facturas">Facturas</string>
     <string name="smart_solar">Smart Solar</string>
     <string name="filtrar_facturas">Filtrar facturas</string>
+    <string name="consumo">Consumo</string>
+    <string name="atras">Atrás</string>
 </resources>

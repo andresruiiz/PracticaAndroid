@@ -59,7 +59,7 @@ fun HomeButtons(
 ) {
     Column(
         modifier.fillMaxSize()
-            .padding(16.dp),
+            .padding(32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

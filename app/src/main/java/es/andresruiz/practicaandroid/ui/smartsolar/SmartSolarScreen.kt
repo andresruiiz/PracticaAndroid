@@ -1,19 +1,25 @@
 package es.andresruiz.practicaandroid.ui.smartsolar
 
+import android.R.attr.maxWidth
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
@@ -23,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
@@ -33,6 +40,8 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
@@ -54,6 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import es.andresruiz.practicaandroid.R
@@ -187,49 +197,41 @@ fun DetallesScreen() {
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        SectionTitle(title = "CAU (Código Autoconsumo)")
-        TextDetail(text = "ES002100000000199LJ1FA000")
+        DetallesTextField(
+            label = "CAU (Código Autoconsumo)",
+            text = "ES002100000000199LJ1FA000",
+            onValueChange = {},
+            showDialog = {}
+        )
 
-        Divider(modifier = Modifier.padding(vertical = 12.dp))
+        DetallesTextField(
+            label = "Estado solicitud alta autoconsumidor",
+            text = "No hemos recibido ninguna solicitud de autoconsumo",
+            onValueChange = {},
+            showDialog = { showDialog = true },
+            infoIcon = true
+        )
 
-        SectionTitle(title = "Estado solicitud alta autoconsumidor")
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "No hemos recibido ninguna solicitud de autoconsumo",
-                fontSize = 16.sp,
-                color = Color.DarkGray,
-                modifier = Modifier.weight(1f)
-            )
+        DetallesTextField(
+            label = "Tipo autoconsumo",
+            text = "Con excedentes y compensación individual - Consumo",
+            onValueChange = {},
+            showDialog = {}
+        )
 
-            IconButton(
-                onClick = { showDialog = true },
-                modifier = Modifier.size(24.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_info),
-                    contentDescription = "Información",
-                    tint = Color(0xFF2196F3)
-                )
-            }
-        }
+        DetallesTextField(
+            label = "Compensación de excedentes",
+            text = "Precio PVPC",
+            onValueChange = {},
+            showDialog = {}
+        )
 
-        Divider(modifier = Modifier.padding(vertical = 12.dp))
-
-        SectionTitle(title = "Tipo autoconsumo")
-        TextDetail(text = "Con excedentes y compensación individual - Consumo")
-
-        Divider(modifier = Modifier.padding(vertical = 12.dp))
-
-        SectionTitle(title = "Compensación de excedentes")
-        TextDetail(text = "Precio PVPC")
-
-        Divider(modifier = Modifier.padding(vertical = 12.dp))
-
-        SectionTitle(title = "Potencia de instalación")
-        TextDetail(text = "5kWp")
+        DetallesTextField(
+            label = "Potencia de instalación",
+            text = "5kWp",
+            onValueChange = {},
+            showDialog = {}
+        )
     }
 
     if (showDialog) {
@@ -271,22 +273,65 @@ fun DetallesScreen() {
 }
 
 @Composable
-private fun SectionTitle(title: String) {
-    Text(
-        text = title,
-        fontSize = 12.sp,
-        color = Color.Gray,
-        modifier = Modifier.padding(bottom = 4.dp)
-    )
-}
-
-@Composable
-private fun TextDetail(text: String) {
-    Text(
-        text = text,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Normal,
-        color = Color.DarkGray
+private fun DetallesTextField(
+    label: String,
+    text: String,
+    onValueChange: (String) -> Unit,
+    infoIcon: Boolean = false,
+    showDialog: () -> Unit
+) {
+    BasicTextField(
+        enabled = false,
+        value = text,
+        onValueChange = onValueChange,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = Color.Transparent,
+                shape = MaterialTheme.shapes.small
+            )
+            .padding(bottom = 32.dp),
+        textStyle = LocalTextStyle.current.copy(
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Start
+        ),
+        decorationBox = { innerTextField ->
+            Column {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                ) {
+                    innerTextField()
+                    if (infoIcon) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                        ) {
+                            IconButton(
+                                onClick = { showDialog() },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_info),
+                                    contentDescription = "Información",
+                                    tint = Color(0xFF2196F3)
+                                )
+                            }
+                        }
+                    }
+                }
+                Divider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.Gray
+                )
+            }
+        }
     )
 }
 

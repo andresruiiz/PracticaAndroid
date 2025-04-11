@@ -42,6 +42,7 @@ import es.andresruiz.practicaandroid.R
 import es.andresruiz.domain.models.Factura
 import es.andresruiz.practicaandroid.navigation.Filtros
 import es.andresruiz.practicaandroid.ui.components.FacturaItem
+import es.andresruiz.practicaandroid.ui.components.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +57,14 @@ fun FacturasScreen(navController: NavController, viewModel: FacturasViewModel = 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            FacturasTopBar(navController, scrollBehavior)
+            TopBar(
+                navController = navController,
+                scrollBehavior = scrollBehavior,
+                title = stringResource(R.string.facturas),
+                backText = stringResource(R.string.consumo),
+                actionsIcon = painterResource(id = R.drawable.filtericon_3x),
+                actionsOnClick = { navController.navigate(Filtros) }
+            )
         },
     ) { innerPadding ->
         FacturasList(facturas, innerPadding, viewModel)
@@ -65,62 +73,6 @@ fun FacturasScreen(navController: NavController, viewModel: FacturasViewModel = 
     if (showDialog) {
         FacturasDialog(viewModel)
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FacturasTopBar(navController: NavController, scrollBehavior: TopAppBarScrollBehavior) {
-    MediumTopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-        ),
-        title = {
-            Text(
-                text = stringResource(R.string.facturas),
-                fontWeight = FontWeight.Bold,
-                fontSize = 40.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        },
-        navigationIcon = {
-            TextButton(onClick = { navController.popBackStack() }) {
-
-                val icon: Painter = painterResource(id = R.drawable.ic_arrow_back)
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = icon,
-                        contentDescription = "Botón para volver a consumo",
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(20.dp)
-                    )
-                    Text(
-                        "Consumo",
-                        fontSize = 20.sp
-                    )
-                }
-            }
-        },
-        actions = {
-            IconButton(onClick = { navController.navigate(Filtros) }) {
-
-                val icon: Painter = painterResource(id = R.drawable.filtericon_3x)
-
-                Icon(
-                    painter = icon,
-                    contentDescription = "Botón de filtros",
-                    modifier = Modifier
-                        .size(30.dp)
-                )
-            }
-        },
-        scrollBehavior = scrollBehavior
-    )
 }
 
 @Composable

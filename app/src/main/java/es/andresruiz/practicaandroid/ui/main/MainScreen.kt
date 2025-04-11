@@ -1,5 +1,6 @@
 package es.andresruiz.practicaandroid.ui.main
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,13 +32,10 @@ fun MainScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
                 title = {
-                    Text(
-                        text = stringResource(R.string.app_name)
+                    Image(
+                        painter = painterResource(id = R.drawable.iber_logo),
+                        contentDescription = "Logo de la aplicación"
                     )
                 }
             )
@@ -70,7 +69,9 @@ fun HomeButtons(
             onClick = {
                 navController.navigate(Facturas)
             },
-            modifier.fillMaxWidth()
+            modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         ) {
             Text(
                 text = stringResource(R.string.facturas)

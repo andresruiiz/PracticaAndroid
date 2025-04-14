@@ -66,15 +66,12 @@ fun FiltrosScreen(
     viewModel: FiltrosViewModel = viewModel()
 ) {
 
-    var startDate by remember { mutableStateOf("") }
-    var endDate by remember { mutableStateOf("") }
-    var sliderValueRange by remember { mutableStateOf(5f..250f) }
-
-    var isPagadasChecked by remember { mutableStateOf(false) }
-    var isAnuladasChecked by remember { mutableStateOf(false) }
-    var isCuotaFijaChecked by remember { mutableStateOf(false) }
-    var isPendientesChecked by remember { mutableStateOf(false) }
-    var isPlanPagoChecked by remember { mutableStateOf(false) }
+    val fechaDesde by viewModel.fechaDesde.collectAsState()
+    val fechaHasta by viewModel.fechaHasta.collectAsState()
+    val importeMin = viewModel.importeMin.collectAsState().value.toFloat()
+    val importeMax = viewModel.importeMax.collectAsState().value.toFloat()
+    val sliderValueRange = importeMin..importeMax
+    val estados by viewModel.estados.collectAsState()
 
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -101,7 +98,7 @@ fun FiltrosScreen(
             verticalArrangement = Arrangement.Top
         ) {
             // Selector de fechas
-            DateFilterSection(viewModel)
+            DateFilterSection(viewModel, fechaDesde, fechaHasta)
 
             Divider(
                 modifier = Modifier.padding(vertical = 16.dp),
@@ -111,7 +108,10 @@ fun FiltrosScreen(
             // Sección de importe
             AmountFilterSection(
                 sliderValueRange = sliderValueRange,
-                onSliderValueChange = { sliderValueRange = it },
+                onSliderValueChange = {
+                    viewModel.setImporteMin(it.start.toInt())
+                    viewModel.setImporteMax(it.endInclusive.toInt())
+                },
                 maxFacturaValue = 300f
             )
 
@@ -122,16 +122,16 @@ fun FiltrosScreen(
 
             // Sección de estado
             StatusFilterSection(
-                isPagadasChecked = isPagadasChecked,
-                isAnuladasChecked = isAnuladasChecked,
-                isCuotaFijaChecked = isCuotaFijaChecked,
-                isPendientesChecked = isPendientesChecked,
-                isPlanPagoChecked = isPlanPagoChecked,
-                onPagadasChange = { isPagadasChecked = it },
-                onAnuladasChange = { isAnuladasChecked = it },
-                onCuotaFijaChange = { isCuotaFijaChecked = it },
-                onPendientesChange = { isPendientesChecked = it },
-                onPlanPagoChange = { isPlanPagoChecked = it }
+                isPagadasChecked = estados["Pagadas"] == true,
+                isAnuladasChecked = estados["Anuladas"] == true,
+                isCuotaFijaChecked = estados["Cuota Fija"] == true,
+                isPendientesChecked = estados["Pendientes de pago"] == true,
+                isPlanPagoChecked = estados["Plan de pago"] == true,
+                onPagadasChange = { viewModel.toggleEstado("Pagadas") },
+                onAnuladasChange = { viewModel.toggleEstado("Anuladas") },
+                onCuotaFijaChange = { viewModel.toggleEstado("Cuota Fija") },
+                onPendientesChange = { viewModel.toggleEstado("Pendientes de pago") },
+                onPlanPagoChange = { viewModel.toggleEstado("Plan de pago") }
             )
 
             // Botones
@@ -139,14 +139,10 @@ fun FiltrosScreen(
 
             ButtonsSection(
                 onClearFilters = {
-                    startDate = ""
-                    endDate = ""
-                    sliderValueRange = 5f..250f
-                    isPagadasChecked = false
-                    isAnuladasChecked = false
-                    isCuotaFijaChecked = false
-                    isPendientesChecked = false
-                    isPlanPagoChecked = false
+                    viewModel.limpiarFiltros()
+                },
+                onApplyFilters = {
+                    viewModel.aplicarFiltros()
                 }
             )
         }
@@ -155,10 +151,11 @@ fun FiltrosScreen(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DateFilterSection(viewModel: FiltrosViewModel) {
-    val fechaDesde by viewModel.fechaDesde.collectAsState()
-    val fechaHasta by viewModel.fechaHasta.collectAsState()
-
+fun DateFilterSection(
+    viewModel: FiltrosViewModel,
+    fechaDesde: String,
+    fechaHasta: String
+) {
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
 
@@ -406,7 +403,8 @@ fun StatusFilterSection(
 
 @Composable
 fun ButtonsSection(
-    onClearFilters: () -> Unit
+    onClearFilters: () -> Unit,
+    onApplyFilters: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -416,7 +414,7 @@ fun ButtonsSection(
     ) {
 
         Button(
-            onClick = {},
+            onClick = onApplyFilters,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp)

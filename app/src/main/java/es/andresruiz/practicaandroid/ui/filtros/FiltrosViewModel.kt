@@ -59,4 +59,8 @@ class FiltrosViewModel : ViewModel() {
         _importeMax.value = 300
         _estados.value = _estados.value.mapValues { false }
     }
+
+    fun aplicarFiltros() {
+        // TODO: Aplicar filtros
+    }
 }

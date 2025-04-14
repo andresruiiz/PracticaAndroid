@@ -56,31 +56,39 @@ fun FacturasScreen(navController: NavController, viewModel: FacturasViewModel = 
             )
         },
     ) { innerPadding ->
-        FacturasList(facturas, innerPadding, viewModel)
+        FacturasList(
+            facturas = facturas,
+            innerPadding = innerPadding,
+            onFacturaClick = { viewModel.showDialog() }
+        )
     }
 
     if (showDialog) {
-        FacturasDialog(viewModel)
+        FacturasDialog(onDismiss = { viewModel.hideDialog() })
     }
 }
 
 @Composable
-fun FacturasList(facturas: List<Factura>, innerPadding: PaddingValues, viewModel: FacturasViewModel) {
+fun FacturasList(
+    facturas: List<Factura>,
+    innerPadding: PaddingValues,
+    onFacturaClick: () -> Unit
+) {
     LazyColumn (
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding),
     ) {
         items(facturas) { factura ->
-            FacturaItem(factura = factura, onClick = { viewModel.showDialog() })
+            FacturaItem(factura = factura, onClick = onFacturaClick)
         }
     }
 }
 
 @Composable
-fun FacturasDialog(viewModel: FacturasViewModel) {
+fun FacturasDialog(onDismiss: () -> Unit) {
     AlertDialog(
-        onDismissRequest = { viewModel.hideDialog() },
+        onDismissRequest = onDismiss,
         title = {
             Text(
                 text = "Información",
@@ -103,7 +111,7 @@ fun FacturasDialog(viewModel: FacturasViewModel) {
                 contentAlignment = Alignment.Center
             ) {
                 Button(
-                    onClick = { viewModel.hideDialog() },
+                    onClick = onDismiss,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 30.dp)

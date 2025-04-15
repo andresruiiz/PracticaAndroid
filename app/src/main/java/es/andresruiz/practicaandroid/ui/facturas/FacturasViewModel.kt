@@ -24,18 +24,24 @@ class FacturasViewModel(private val repository: FacturasRepository) : ViewModel(
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
 
+    // Estado de carga
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     init {
         getFacturas()
     }
 
     // Obtengo las facturas desde el Repository
     fun getFacturas() {
-
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 _facturas.value = repository.getFacturas()
             } catch (e: Exception) {
                 e.printStackTrace()
+            } finally {
+                _isLoading.value = false
             }
         }
     }

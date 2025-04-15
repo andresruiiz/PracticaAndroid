@@ -15,6 +15,7 @@ material = "1.12.0"
 jetbrainsKotlinJvm = "2.0.21"
 navigationCompose = "2.8.9"
 retrofit = "2.11.0"
+retromock = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retromock = { module = "co.infinitum:retromock", version.ref = "retromock" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

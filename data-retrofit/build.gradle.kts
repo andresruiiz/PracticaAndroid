@@ -42,6 +42,9 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
+    // Retromock
+    implementation(libs.retromock)
+
     // Módulo domain
     implementation(project(":domain"))
 

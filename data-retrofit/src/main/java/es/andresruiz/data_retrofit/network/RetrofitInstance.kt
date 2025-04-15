@@ -3,6 +3,7 @@ package es.andresruiz.data_retrofit.network
 import android.annotation.SuppressLint
 import android.content.Context
 import co.infinum.retromock.Retromock
+import es.andresruiz.domain.UseMockProvider
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -11,9 +12,11 @@ object RetrofitInstance {
     private const val BASE_URL = "https://d25ffc74-c8b3-45aa-9094-eb029fba47a0.mock.pstmn.io"
 
     private lateinit var context: Context
+    private lateinit var useMockProvider: UseMockProvider
 
-    fun init(context: Context) {
+    fun init(context: Context, useMockProvider: UseMockProvider) {
         this.context = context.applicationContext
+        this.useMockProvider = useMockProvider
     }
 
     private val retrofit: Retrofit by lazy {
@@ -30,16 +33,12 @@ object RetrofitInstance {
             .build()
     }
 
-    val facturasApiService: FacturasApiService by lazy {
-        if (useMock()) {
-            retromock.create(FacturasApiService::class.java)
-        } else {
-            retrofit.create(FacturasApiService::class.java)
-        }
-    }
-
-    // Función para determinar si está activado el sistema de Mocks
-    private fun useMock(): Boolean {
-        return true // True a mano por ahora
+    val facturasApiService: FacturasApiService
+        get() {
+            return if (useMockProvider.isMockEnabled()) {
+                retromock.create(FacturasApiService::class.java)
+            } else {
+                retrofit.create(FacturasApiService::class.java)
+            }
     }
 }

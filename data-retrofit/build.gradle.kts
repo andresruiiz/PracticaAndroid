@@ -45,6 +45,9 @@ dependencies {
     // Retromock
     implementation(libs.retromock)
 
+    // Jetpack DataStore
+    implementation(libs.androidx.datastore.preferences)
+
     // Módulo domain
     implementation(project(":domain"))
 

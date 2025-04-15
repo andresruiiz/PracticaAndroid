@@ -38,7 +38,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-retromock = { module = "co.infinitum:retromock", version.ref = "retromock" }
+retromock = { module = "co.infinum:retromock", version.ref = "retromock" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

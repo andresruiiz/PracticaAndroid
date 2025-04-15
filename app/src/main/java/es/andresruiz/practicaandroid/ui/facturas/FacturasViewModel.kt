@@ -1,12 +1,20 @@
 package es.andresruiz.practicaandroid.ui.facturas
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import es.andresruiz.data_retrofit.network.RetrofitInstance
+import es.andresruiz.data_retrofit.repository.FacturasRepository
+import es.andresruiz.data_retrofit.repository.NetworkFacturasRepository
 import es.andresruiz.domain.models.Factura
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class FacturasViewModel : ViewModel() {
+class FacturasViewModel(private val repository: FacturasRepository) : ViewModel() {
 
     // Estado de las facturas
     private val _facturas = MutableStateFlow<List<Factura>>(emptyList())
@@ -20,14 +28,16 @@ class FacturasViewModel : ViewModel() {
         getFacturas()
     }
 
-    // Obtengo las facturas, por ahora hardcodeadas
+    // Obtengo las facturas desde el Repository
     fun getFacturas() {
-        _facturas.value = listOf(
-            Factura(descEstado = "Pendiente de pago", importeOrdenacion = 54.56, fecha = "31/08/2020"),
-            Factura(descEstado = "Pendiente de pago", importeOrdenacion = 67.54, fecha = "31/07/2020"),
-            Factura(descEstado = "Pendiente de pago", importeOrdenacion = 56.38, fecha = "22/06/2020"),
-            Factura(descEstado = "Pagada", importeOrdenacion = 57.38, fecha = "31/05/2020")
-        )
+
+        viewModelScope.launch {
+            try {
+                _facturas.value = repository.getFacturas()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun showDialog() {
@@ -36,5 +46,20 @@ class FacturasViewModel : ViewModel() {
 
     fun hideDialog() {
         _showDialog.value = false
+    }
+
+    companion object {
+        fun provideFactory(): ViewModelProvider.Factory {
+            val repository = NetworkFacturasRepository(RetrofitInstance.facturasApiService)
+            return object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass : Class<T>): T {
+                    if (modelClass.isAssignableFrom(FacturasViewModel::class.java)) {
+                        @Suppress("UNCHECKED_CAST")
+                        return FacturasViewModel(repository) as T
+                    }
+                    throw IllegalArgumentException("Unknown ViewModel class")
+                }
+            }
+        }
     }
 }

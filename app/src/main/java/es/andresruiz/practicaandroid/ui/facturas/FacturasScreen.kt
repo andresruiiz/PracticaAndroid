@@ -35,7 +35,10 @@ import es.andresruiz.practicaandroid.ui.components.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturasScreen(navController: NavController, viewModel: FacturasViewModel = viewModel()) {
+fun FacturasScreen(navController: NavController) {
+    val viewModel: FacturasViewModel = viewModel(
+        factory = FacturasViewModel.provideFactory()
+    )
 
     val facturas = viewModel.facturas.collectAsState().value
     val showDialog = viewModel.showDialog.collectAsState().value

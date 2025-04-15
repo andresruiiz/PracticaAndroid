@@ -12,4 +12,8 @@ object RetrofitInstance {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
+
+    val facturasApiService: FacturasApiService by lazy {
+        retrofit.create(FacturasApiService::class.java)
+    }
 }

@@ -42,6 +42,12 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
+    // Retromock
+    implementation(libs.retromock)
+
+    // Jetpack DataStore
+    implementation(libs.androidx.datastore.preferences)
+
     // Módulo domain
     implementation(project(":domain"))
 

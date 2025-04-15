@@ -51,14 +51,17 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    //Jetpack Navigation
+    // Jetpack Navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
-    //Módulo domain
+    // Jetpack DataStore
+    implementation(libs.androidx.datastore.preferences)
+
+    // Módulo domain
     implementation(project(":domain"))
 
-    //Módulo data-retrofit
+    // Módulo data-retrofit
     implementation(project(":data-retrofit"))
 
     testImplementation(libs.junit)

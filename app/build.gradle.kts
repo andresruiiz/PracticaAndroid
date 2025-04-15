@@ -58,6 +58,9 @@ dependencies {
     //Módulo domain
     implementation(project(":domain"))
 
+    //Módulo data-retrofit
+    implementation(project(":data-retrofit"))
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

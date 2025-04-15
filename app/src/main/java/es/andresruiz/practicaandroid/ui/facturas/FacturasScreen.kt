@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,10 +36,14 @@ import es.andresruiz.practicaandroid.ui.components.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturasScreen(navController: NavController, viewModel: FacturasViewModel = viewModel()) {
+fun FacturasScreen(navController: NavController) {
+    val viewModel: FacturasViewModel = viewModel(
+        factory = FacturasViewModel.provideFactory()
+    )
 
     val facturas = viewModel.facturas.collectAsState().value
     val showDialog = viewModel.showDialog.collectAsState().value
+    val isLoading = viewModel.isLoading.collectAsState().value
 
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -56,11 +61,20 @@ fun FacturasScreen(navController: NavController, viewModel: FacturasViewModel = 
             )
         },
     ) { innerPadding ->
-        FacturasList(
-            facturas = facturas,
-            innerPadding = innerPadding,
-            onFacturaClick = { viewModel.showDialog() }
-        )
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            FacturasList(
+                facturas = facturas,
+                innerPadding = innerPadding,
+                onFacturaClick = { viewModel.showDialog() }
+            )
+        }
     }
 
     if (showDialog) {

@@ -69,20 +69,11 @@ fun FacturasScreen(navController: NavController) {
             onRefresh = { viewModel.refreshFacturas() },
             modifier = Modifier.fillMaxSize()
         ) {
-            if (isLoading && facturas.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                FacturasList(
-                    facturas = facturas,
-                    innerPadding = innerPadding,
-                    onFacturaClick = { viewModel.showDialog() }
-                )
-            }
+            FacturasList(
+                facturas = facturas,
+                innerPadding = innerPadding,
+                onFacturaClick = { viewModel.showDialog() }
+            )
         }
     }
 

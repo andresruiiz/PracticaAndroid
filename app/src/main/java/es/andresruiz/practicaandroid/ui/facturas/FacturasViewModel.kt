@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import es.andresruiz.data_retrofit.database.FacturasRepositoryProvider
 import es.andresruiz.data_retrofit.repository.FacturasRepository
 import es.andresruiz.domain.models.Factura
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,6 +44,8 @@ class FacturasViewModel(private val repository: FacturasRepository) : ViewModel(
     }
 
     fun refreshFacturas() {
+        if (_isLoading.value) return
+
         viewModelScope.launch {
             _isLoading.value = true
             try {

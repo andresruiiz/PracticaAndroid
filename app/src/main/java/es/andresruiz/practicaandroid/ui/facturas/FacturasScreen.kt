@@ -64,16 +64,21 @@ fun FacturasScreen(navController: NavController) {
             )
         },
     ) { innerPadding ->
-        PullToRefreshBox(
-            isRefreshing = isLoading,
-            onRefresh = { viewModel.refreshFacturas() },
-            modifier = Modifier.fillMaxSize()
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
-            FacturasList(
-                facturas = facturas,
-                innerPadding = innerPadding,
-                onFacturaClick = { viewModel.showDialog() }
-            )
+            PullToRefreshBox(
+                isRefreshing = isLoading,
+                onRefresh = { viewModel.refreshFacturas() },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                FacturasList(
+                    facturas = facturas,
+                    onFacturaClick = { viewModel.showDialog() }
+                )
+            }
         }
     }
 
@@ -85,13 +90,11 @@ fun FacturasScreen(navController: NavController) {
 @Composable
 fun FacturasList(
     facturas: List<Factura>,
-    innerPadding: PaddingValues,
     onFacturaClick: () -> Unit
 ) {
     LazyColumn (
         modifier = Modifier
             .fillMaxSize()
-            .padding(innerPadding),
     ) {
         items(facturas) { factura ->
             FacturaItem(factura = factura, onClick = onFacturaClick)

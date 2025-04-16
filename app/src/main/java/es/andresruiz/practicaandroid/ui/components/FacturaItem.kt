@@ -32,7 +32,7 @@ fun FacturaItem(factura: Factura, modifier: Modifier = Modifier, onClick: () -> 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp)
+                .height(70.dp)
                 .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -44,6 +44,7 @@ fun FacturaItem(factura: Factura, modifier: Modifier = Modifier, onClick: () -> 
                 Text(
                     text = factura.fecha,
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Medium
                 )
 
@@ -64,6 +65,7 @@ fun FacturaItem(factura: Factura, modifier: Modifier = Modifier, onClick: () -> 
                 Text(
                     text = String.format("%.2f €", factura.importeOrdenacion), // Formateado para 2 decimales
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold
                 )
 

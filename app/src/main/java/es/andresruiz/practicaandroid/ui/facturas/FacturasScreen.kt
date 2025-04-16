@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,8 +39,9 @@ import es.andresruiz.practicaandroid.ui.components.TopBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FacturasScreen(navController: NavController) {
+    val context = LocalContext.current
     val viewModel: FacturasViewModel = viewModel(
-        factory = FacturasViewModel.provideFactory()
+        factory = FacturasViewModel.provideFactory(context)
     )
 
     val facturas = viewModel.facturas.collectAsState().value
@@ -61,19 +64,21 @@ fun FacturasScreen(navController: NavController) {
             )
         },
     ) { innerPadding ->
-        if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            PullToRefreshBox(
+                isRefreshing = isLoading,
+                onRefresh = { viewModel.refreshFacturas() },
+                modifier = Modifier.fillMaxSize()
             ) {
-                CircularProgressIndicator()
+                FacturasList(
+                    facturas = facturas,
+                    onFacturaClick = { viewModel.showDialog() }
+                )
             }
-        } else {
-            FacturasList(
-                facturas = facturas,
-                innerPadding = innerPadding,
-                onFacturaClick = { viewModel.showDialog() }
-            )
         }
     }
 
@@ -85,13 +90,11 @@ fun FacturasScreen(navController: NavController) {
 @Composable
 fun FacturasList(
     facturas: List<Factura>,
-    innerPadding: PaddingValues,
     onFacturaClick: () -> Unit
 ) {
     LazyColumn (
         modifier = Modifier
             .fillMaxSize()
-            .padding(innerPadding),
     ) {
         items(facturas) { factura ->
             FacturaItem(factura = factura, onClick = onFacturaClick)

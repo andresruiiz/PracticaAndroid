@@ -74,9 +74,15 @@ fun FiltrosScreen(
 
     val fechaDesde by viewModel.fechaDesde.collectAsState()
     val fechaHasta by viewModel.fechaHasta.collectAsState()
-    val importeMin = viewModel.importeMin.collectAsState().value.toFloat()
-    val importeMax = viewModel.importeMax.collectAsState().value.toFloat()
-    val sliderValueRange = importeMin..importeMax
+
+    // Valores seleccionados por el usuario en el slider
+    val selectedImporteMin by viewModel.importeMin.collectAsState()
+    val selectedImporteMax by viewModel.importeMax.collectAsState()
+
+    // Límites reales del slider obtenidos del ViewModel
+    val actualMinImporte by viewModel.actualMinImporte.collectAsState()
+    val actualMaxImporte by viewModel.actualMaxImporte.collectAsState()
+
     val estados by viewModel.estados.collectAsState()
 
     val scrollBehavior =
@@ -113,12 +119,17 @@ fun FiltrosScreen(
 
             // Sección de importe
             AmountFilterSection(
-                sliderValueRange = sliderValueRange,
-                onSliderValueChange = {
-                    viewModel.setImporteMin(it.start.toInt())
-                    viewModel.setImporteMax(it.endInclusive.toInt())
-                },
-                maxFacturaValue = 300f
+                // Los valores seleccionados actualmente por el usuario
+                selectedRangeStart = selectedImporteMin.toFloat(),
+                selectedRangeEnd = selectedImporteMax.toFloat(),
+                // Los límites MÍNIMO y MÁXIMO posibles según los datos
+                actualMinBound = actualMinImporte.toFloat(),
+                actualMaxBound = actualMaxImporte.toFloat(),
+                // Callback para cuando el usuario mueve el slider
+                onSliderValueChange = { newRange ->
+                    viewModel.setImporteMin(newRange.start.toInt())
+                    viewModel.setImporteMax(newRange.endInclusive.toInt())
+                }
             )
 
             Divider(
@@ -305,10 +316,23 @@ fun convertMillisToDate(millis: Long): String {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AmountFilterSection(
-    sliderValueRange: ClosedFloatingPointRange<Float>,
-    onSliderValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
-    maxFacturaValue: Float
+    selectedRangeStart: Float,
+    selectedRangeEnd: Float,
+    actualMinBound: Float,
+    actualMaxBound: Float,
+    onSliderValueChange: (ClosedFloatingPointRange<Float>) -> Unit
 ) {
+
+    // Asegurarse de que los límites reales sean válidos (max >= min)
+    val validActualMin = if (actualMinBound > actualMaxBound) actualMaxBound else actualMinBound
+    val validActualMax = if (actualMaxBound < actualMinBound) actualMinBound else actualMaxBound
+
+    // Aseguro de que los valores seleccionados estén dentro de los límites reales válidos
+    val sliderCurrentValue = selectedRangeStart.coerceIn(validActualMin, validActualMax)..selectedRangeEnd.coerceIn(validActualMin, validActualMax)
+
+    // Crear el rango posible para el slider
+    val sliderValueRange = validActualMin..validActualMax
+
     Text(
         text = "Por un importe",
         fontWeight = FontWeight.Medium,
@@ -321,7 +345,7 @@ fun AmountFilterSection(
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "${sliderValueRange.start.toInt()} € - ${sliderValueRange.endInclusive.toInt()} €",
+            text = "${sliderCurrentValue.start.toInt()} € - ${sliderCurrentValue.endInclusive.toInt()} €",
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Medium
         )
@@ -330,20 +354,20 @@ fun AmountFilterSection(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 3.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "1 €", color = MaterialTheme.colorScheme.secondary, fontSize = 14.sp)
-            Text(text = "$maxFacturaValue €", color = MaterialTheme.colorScheme.secondary, fontSize = 14.sp)
+            Text(text = "${validActualMin.toInt()} €", color = MaterialTheme.colorScheme.secondary, fontSize = 14.sp)
+            Text(text = "${validActualMax.toInt()} €", color = MaterialTheme.colorScheme.secondary, fontSize = 14.sp)
         }
 
         RangeSlider(
-            value = sliderValueRange,
+            value = sliderCurrentValue,
             onValueChange = onSliderValueChange,
-            valueRange = 1f..maxFacturaValue,
+            valueRange = sliderValueRange,
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,
                 activeTrackColor = MaterialTheme.colorScheme.primary,
@@ -367,12 +391,6 @@ fun AmountFilterSection(
                     interactionSource = remember { MutableInteractionSource() },
                     colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary)
                 )
-//                Box(
-//                    modifier = Modifier
-//                        .size(30.dp)
-//                        .clip(CircleShape)
-//                        .background(MaterialTheme.colorScheme.primary)
-//                )
             },
             track = { sliderState ->
                 SliderDefaults.Track(

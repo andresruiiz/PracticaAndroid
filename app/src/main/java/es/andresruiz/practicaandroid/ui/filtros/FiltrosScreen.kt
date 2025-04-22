@@ -101,7 +101,7 @@ fun FiltrosScreen(
             DateFilterSection(viewModel, fechaDesde, fechaHasta)
 
             Divider(
-                modifier = Modifier.padding(vertical = 16.dp),
+                modifier = Modifier.padding(vertical = 32.dp),
                 color = MaterialTheme.colorScheme.secondary
             )
 
@@ -116,7 +116,7 @@ fun FiltrosScreen(
             )
 
             Divider(
-                modifier = Modifier.padding(vertical = 16.dp),
+                modifier = Modifier.padding(vertical = 32.dp),
                 color = MaterialTheme.colorScheme.secondary
             )
 
@@ -168,11 +168,9 @@ fun DateFilterSection(
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Desde
         Column(
-            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
             Text(
@@ -192,7 +190,6 @@ fun DateFilterSection(
 
         // Hasta
         Column(
-            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
             Text(
@@ -242,11 +239,11 @@ fun SimpleDateField(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
+            //.fillMaxWidth()
+            .height(38.dp)
             .background(
                 color = MaterialTheme.colorScheme.secondary,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             )
             .clickable { onClick() }
             .padding(horizontal = 16.dp),
@@ -367,7 +364,7 @@ fun StatusFilterSection(
         text = "Por estado",
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        modifier = Modifier.padding(bottom = 12.dp)
+        modifier = Modifier.padding(bottom = 6.dp)
     )
 
     CheckboxItem(
@@ -443,6 +440,7 @@ fun CheckboxItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .height(40.dp)
     ) {
         Checkbox(
             checked = isChecked,

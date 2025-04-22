@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import es.andresruiz.core.utils.formatDateToDisplay
 import es.andresruiz.domain.models.Factura
 import es.andresruiz.practicaandroid.R
 
@@ -37,12 +38,12 @@ fun FacturaItem(factura: Factura, modifier: Modifier = Modifier, onClick: () -> 
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Columna de la derecha (Fecha y estado)
+            // Columna de la izquierda (Fecha y estado)
             Column(modifier = Modifier.weight(1f)) {
 
                 // Falta darle formato a la fecha
                 Text(
-                    text = factura.fecha,
+                    text = formatDateToDisplay(factura.fecha),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Medium

@@ -64,6 +64,9 @@ dependencies {
     // Módulo data-retrofit
     implementation(project(":data-retrofit"))
 
+    // Módulo core
+    implementation(project(":core"))
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

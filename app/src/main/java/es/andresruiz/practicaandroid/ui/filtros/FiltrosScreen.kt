@@ -122,15 +122,15 @@ fun FiltrosScreen(
 
             // Sección de estado
             StatusFilterSection(
-                isPagadasChecked = estados["Pagadas"] == true,
-                isAnuladasChecked = estados["Anuladas"] == true,
+                isPagadasChecked = estados["Pagada"] == true,
+                isAnuladasChecked = estados["Anulada"] == true,
                 isCuotaFijaChecked = estados["Cuota Fija"] == true,
-                isPendientesChecked = estados["Pendientes de pago"] == true,
+                isPendientesChecked = estados["Pendiente de pago"] == true,
                 isPlanPagoChecked = estados["Plan de pago"] == true,
-                onPagadasChange = { viewModel.toggleEstado("Pagadas") },
-                onAnuladasChange = { viewModel.toggleEstado("Anuladas") },
+                onPagadasChange = { viewModel.toggleEstado("Pagada") },
+                onAnuladasChange = { viewModel.toggleEstado("Anulada") },
                 onCuotaFijaChange = { viewModel.toggleEstado("Cuota Fija") },
-                onPendientesChange = { viewModel.toggleEstado("Pendientes de pago") },
+                onPendientesChange = { viewModel.toggleEstado("Pendiente de pago") },
                 onPlanPagoChange = { viewModel.toggleEstado("Plan de pago") }
             )
 
@@ -143,6 +143,7 @@ fun FiltrosScreen(
                 },
                 onApplyFilters = {
                     viewModel.aplicarFiltros()
+                    navController.popBackStack() // Volver a la pantalla de facturas después de aplicar los filtros
                 }
             )
         }

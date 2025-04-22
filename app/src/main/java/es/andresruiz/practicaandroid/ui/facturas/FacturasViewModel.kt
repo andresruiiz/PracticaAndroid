@@ -7,15 +7,22 @@ import androidx.lifecycle.viewModelScope
 import es.andresruiz.data_retrofit.database.FacturasRepositoryProvider
 import es.andresruiz.data_retrofit.repository.FacturasRepository
 import es.andresruiz.domain.models.Factura
+import es.andresruiz.practicaandroid.ui.filtros.FilterManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class FacturasViewModel(private val repository: FacturasRepository) : ViewModel() {
 
-    // Estado de las facturas
+    private val filterManager = FilterManager.getInstance()
+
+    // Estado de todas las facturas (sin filtrar)
+    private val _allFacturas = MutableStateFlow<List<Factura>>(emptyList())
+
+    // Estado de las facturas filtradas que se muestran
     private val _facturas = MutableStateFlow<List<Factura>>(emptyList())
     val facturas: StateFlow<List<Factura>> = _facturas.asStateFlow()
 
@@ -29,6 +36,13 @@ class FacturasViewModel(private val repository: FacturasRepository) : ViewModel(
 
     init {
         loadFacturasFromDatabase()
+
+        // Observar cambios en los filtros
+        viewModelScope.launch {
+            filterManager.filterState.collectLatest { filterState ->
+                _facturas.value = filterState.aplicarFiltros(_allFacturas.value)
+            }
+        }
     }
 
     private fun loadFacturasFromDatabase() {
@@ -37,7 +51,9 @@ class FacturasViewModel(private val repository: FacturasRepository) : ViewModel(
                 if (facturas.isEmpty()) {
                     refreshFacturas() // Cargo las facturas desde la API si la base de datos está vacía
                 } else {
-                    _facturas.value = facturas
+                    _allFacturas.value = facturas
+                    // Aplico los filtros actuales a las facturas cargadas
+                    _facturas.value = filterManager.getCurrentFilter().aplicarFiltros(facturas)
                 }
             }
         }

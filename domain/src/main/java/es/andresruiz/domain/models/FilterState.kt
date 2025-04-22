@@ -9,10 +9,10 @@ data class FilterState(
     val importeMin: Int = 1,
     val importeMax: Int = 300,
     val estados: Map<String, Boolean> = mapOf(
-        "Pagadas" to false,
-        "Anuladas" to false,
+        "Pagada" to false,
+        "Anulada" to false,
         "Cuota Fija" to false,
-        "Pendientes de pago" to false,
+        "Pendiente de pago" to false,
         "Plan de pago" to false
     )
 ) {

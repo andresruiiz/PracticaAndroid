@@ -4,6 +4,7 @@ import co.infinum.retromock.meta.Mock
 import co.infinum.retromock.meta.MockCircular
 import co.infinum.retromock.meta.MockResponse
 import co.infinum.retromock.meta.MockResponses
+import es.andresruiz.domain.models.Detalles
 import es.andresruiz.domain.models.FacturasResponse
 import retrofit2.http.GET
 
@@ -18,4 +19,9 @@ interface FacturasApiService {
     )
     @GET("facturas")
     suspend fun getFacturas(): FacturasResponse
+
+    @Mock
+    @MockResponse(body = "mock_detalles.json")
+    @GET("detalles")
+    suspend fun getDetallesSmartSolar(): Detalles
 }

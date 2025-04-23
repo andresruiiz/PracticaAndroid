@@ -329,7 +329,7 @@ private fun DetallesTextField(
                                 Icon(
                                     painter = painterResource(R.drawable.ic_info),
                                     contentDescription = "Información",
-                                    tint = Color(0xFF2196F3)
+                                    tint = Color(0xFF549BFF)
                                 )
                             }
                         }

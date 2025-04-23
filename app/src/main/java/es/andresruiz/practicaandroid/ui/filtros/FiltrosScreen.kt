@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -29,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SliderDefaults.Thumb
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -52,11 +56,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import es.andresruiz.core.utils.convertMillisToDate
 import es.andresruiz.practicaandroid.R
 import es.andresruiz.practicaandroid.ui.components.TopBar
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,9 +70,15 @@ fun FiltrosScreen(
 
     val fechaDesde by viewModel.fechaDesde.collectAsState()
     val fechaHasta by viewModel.fechaHasta.collectAsState()
-    val importeMin = viewModel.importeMin.collectAsState().value.toFloat()
-    val importeMax = viewModel.importeMax.collectAsState().value.toFloat()
-    val sliderValueRange = importeMin..importeMax
+
+    // Valores seleccionados por el usuario en el slider
+    val selectedImporteMin by viewModel.importeMin.collectAsState()
+    val selectedImporteMax by viewModel.importeMax.collectAsState()
+
+    // Límites reales del slider obtenidos del ViewModel
+    val actualMinImporte by viewModel.actualMinImporte.collectAsState()
+    val actualMaxImporte by viewModel.actualMaxImporte.collectAsState()
+
     val estados by viewModel.estados.collectAsState()
 
     val scrollBehavior =
@@ -101,36 +109,41 @@ fun FiltrosScreen(
             DateFilterSection(viewModel, fechaDesde, fechaHasta)
 
             Divider(
-                modifier = Modifier.padding(vertical = 16.dp),
+                modifier = Modifier.padding(vertical = 32.dp),
                 color = MaterialTheme.colorScheme.secondary
             )
 
             // Sección de importe
             AmountFilterSection(
-                sliderValueRange = sliderValueRange,
-                onSliderValueChange = {
-                    viewModel.setImporteMin(it.start.toInt())
-                    viewModel.setImporteMax(it.endInclusive.toInt())
-                },
-                maxFacturaValue = 300f
+                // Los valores seleccionados actualmente por el usuario
+                selectedRangeStart = selectedImporteMin.toFloat(),
+                selectedRangeEnd = selectedImporteMax.toFloat(),
+                // Los límites MÍNIMO y MÁXIMO posibles según los datos
+                actualMinBound = actualMinImporte.toFloat(),
+                actualMaxBound = actualMaxImporte.toFloat(),
+                // Callback para cuando el usuario mueve el slider
+                onSliderValueChange = { newRange ->
+                    viewModel.setImporteMin(newRange.start.toInt())
+                    viewModel.setImporteMax(newRange.endInclusive.toInt())
+                }
             )
 
             Divider(
-                modifier = Modifier.padding(vertical = 16.dp),
+                modifier = Modifier.padding(vertical = 32.dp),
                 color = MaterialTheme.colorScheme.secondary
             )
 
             // Sección de estado
             StatusFilterSection(
-                isPagadasChecked = estados["Pagadas"] == true,
-                isAnuladasChecked = estados["Anuladas"] == true,
+                isPagadasChecked = estados["Pagada"] == true,
+                isAnuladasChecked = estados["Anulada"] == true,
                 isCuotaFijaChecked = estados["Cuota Fija"] == true,
-                isPendientesChecked = estados["Pendientes de pago"] == true,
+                isPendientesChecked = estados["Pendiente de pago"] == true,
                 isPlanPagoChecked = estados["Plan de pago"] == true,
-                onPagadasChange = { viewModel.toggleEstado("Pagadas") },
-                onAnuladasChange = { viewModel.toggleEstado("Anuladas") },
+                onPagadasChange = { viewModel.toggleEstado("Pagada") },
+                onAnuladasChange = { viewModel.toggleEstado("Anulada") },
                 onCuotaFijaChange = { viewModel.toggleEstado("Cuota Fija") },
-                onPendientesChange = { viewModel.toggleEstado("Pendientes de pago") },
+                onPendientesChange = { viewModel.toggleEstado("Pendiente de pago") },
                 onPlanPagoChange = { viewModel.toggleEstado("Plan de pago") }
             )
 
@@ -143,6 +156,7 @@ fun FiltrosScreen(
                 },
                 onApplyFilters = {
                     viewModel.aplicarFiltros()
+                    navController.popBackStack() // Volver a la pantalla de facturas después de aplicar los filtros
                 }
             )
         }
@@ -168,11 +182,9 @@ fun DateFilterSection(
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Desde
         Column(
-            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
             Text(
@@ -192,7 +204,6 @@ fun DateFilterSection(
 
         // Hasta
         Column(
-            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
             Text(
@@ -242,11 +253,11 @@ fun SimpleDateField(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
+            //.fillMaxWidth()
+            .height(38.dp)
             .background(
                 color = MaterialTheme.colorScheme.secondary,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             )
             .clickable { onClick() }
             .padding(horizontal = 16.dp),
@@ -293,18 +304,26 @@ fun DatePickerModal(
     }
 }
 
-fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return formatter.format(Date(millis))
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AmountFilterSection(
-    sliderValueRange: ClosedFloatingPointRange<Float>,
-    onSliderValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
-    maxFacturaValue: Float
+    selectedRangeStart: Float,
+    selectedRangeEnd: Float,
+    actualMinBound: Float,
+    actualMaxBound: Float,
+    onSliderValueChange: (ClosedFloatingPointRange<Float>) -> Unit
 ) {
+
+    // Asegurarse de que los límites reales sean válidos (max >= min)
+    val validActualMin = if (actualMinBound > actualMaxBound) actualMaxBound else actualMinBound
+    val validActualMax = if (actualMaxBound < actualMinBound) actualMinBound else actualMaxBound
+
+    // Aseguro de que los valores seleccionados estén dentro de los límites reales válidos
+    val sliderCurrentValue = selectedRangeStart.coerceIn(validActualMin, validActualMax)..selectedRangeEnd.coerceIn(validActualMin, validActualMax)
+
+    // Crear el rango posible para el slider
+    val sliderValueRange = validActualMin..validActualMax
+
     Text(
         text = "Por un importe",
         fontWeight = FontWeight.Medium,
@@ -317,7 +336,7 @@ fun AmountFilterSection(
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "${sliderValueRange.start.toInt()} € - ${sliderValueRange.endInclusive.toInt()} €",
+            text = "${sliderCurrentValue.start.toInt()} € - ${sliderCurrentValue.endInclusive.toInt()} €",
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Medium
         )
@@ -326,26 +345,52 @@ fun AmountFilterSection(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 3.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "1 €", color = MaterialTheme.colorScheme.secondary, fontSize = 14.sp)
-            Text(text = "$maxFacturaValue €", color = MaterialTheme.colorScheme.secondary, fontSize = 14.sp)
+            Text(text = "${validActualMin.toInt()} €", color = MaterialTheme.colorScheme.secondary, fontSize = 14.sp)
+            Text(text = "${validActualMax.toInt()} €", color = MaterialTheme.colorScheme.secondary, fontSize = 14.sp)
         }
 
         RangeSlider(
-            value = sliderValueRange,
+            value = sliderCurrentValue,
             onValueChange = onSliderValueChange,
-            valueRange = 1f..maxFacturaValue,
+            valueRange = sliderValueRange,
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,
                 activeTrackColor = MaterialTheme.colorScheme.primary,
                 inactiveTrackColor = MaterialTheme.colorScheme.secondary
             ),
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 16.dp),
+            startThumb = {
+                Thumb(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    interactionSource = remember { MutableInteractionSource() },
+                    colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary)
+                )
+            },
+            endThumb = {
+                Thumb(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    interactionSource = remember { MutableInteractionSource() },
+                    colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary)
+                )
+            },
+            track = { sliderState ->
+                SliderDefaults.Track(
+                    modifier = Modifier.height(4.dp),
+                    rangeSliderState = sliderState,
+                    drawStopIndicator = null,
+                    thumbTrackGapSize = 0.dp
+                )
+            }
         )
     }
 }
@@ -367,7 +412,7 @@ fun StatusFilterSection(
         text = "Por estado",
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        modifier = Modifier.padding(bottom = 12.dp)
+        modifier = Modifier.padding(bottom = 6.dp)
     )
 
     CheckboxItem(
@@ -443,6 +488,7 @@ fun CheckboxItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .height(40.dp)
     ) {
         Checkbox(
             checked = isChecked,

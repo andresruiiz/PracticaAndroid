@@ -7,15 +7,24 @@ import androidx.lifecycle.viewModelScope
 import es.andresruiz.data_retrofit.database.FacturasRepositoryProvider
 import es.andresruiz.data_retrofit.repository.FacturasRepository
 import es.andresruiz.domain.models.Factura
+import es.andresruiz.practicaandroid.ui.filtros.FilterManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
+import kotlin.math.floor
 
 class FacturasViewModel(private val repository: FacturasRepository) : ViewModel() {
 
-    // Estado de las facturas
+    private val filterManager = FilterManager.getInstance()
+
+    // Estado de todas las facturas (sin filtrar)
+    private val _allFacturas = MutableStateFlow<List<Factura>>(emptyList())
+
+    // Estado de las facturas filtradas que se muestran
     private val _facturas = MutableStateFlow<List<Factura>>(emptyList())
     val facturas: StateFlow<List<Factura>> = _facturas.asStateFlow()
 
@@ -29,17 +38,51 @@ class FacturasViewModel(private val repository: FacturasRepository) : ViewModel(
 
     init {
         loadFacturasFromDatabase()
+
+        // Observar cambios en los filtros
+        viewModelScope.launch {
+            filterManager.filterState.collectLatest { filterState ->
+                _facturas.value = filterState.aplicarFiltros(_allFacturas.value)
+            }
+        }
     }
 
     private fun loadFacturasFromDatabase() {
         viewModelScope.launch {
             repository.getFacturas().collect { facturas ->
-                if (facturas.isEmpty()) {
-                    refreshFacturas() // Cargo las facturas desde la API si la base de datos está vacía
+                if (facturas.isEmpty() && !_isLoading.value) {
+                    // Cargo las facturas desde la API si la base de datos está vacía
+                    refreshFacturas()
                 } else {
-                    _facturas.value = facturas
+                    _allFacturas.value = facturas
+                    // Calculo y actualizo los límites en FilterManager
+                    updateFilterManagerBounds(facturas)
+                    // Aplico los filtros actuales a las facturas cargadas
+                    _facturas.value = filterManager.getCurrentFilter().aplicarFiltros(facturas)
                 }
             }
+        }
+    }
+
+    // Función para calcular y actualizar los límites del FilterManager
+    private fun updateFilterManagerBounds(facturas: List<Factura>) {
+        if (facturas.isNotEmpty()) {
+            // Obtengo el mínimo y máximo real
+            val actualMinImporte = facturas.minOfOrNull { it.importeOrdenacion }
+            val actualMaxImporte = facturas.maxOfOrNull { it.importeOrdenacion }
+
+            // Calculo límites del slider usando floor y ceil
+            val sliderMin = actualMinImporte?.let { floor(it).toInt() } ?: 1
+            val sliderMax = actualMaxImporte?.let { ceil(it).toInt() } ?: 300
+
+            // Aseguro que el mínimo sea al menos 1 y que el máximo sea >= mínimo
+            val finalSliderMin = sliderMin.coerceAtLeast(1)
+            val finalSliderMax = sliderMax.coerceAtLeast(finalSliderMin)
+
+            // Actualizo el FilterManager con los límites enteros calculados
+            filterManager.updateDataBounds(finalSliderMin, finalSliderMax)
+        } else {
+            filterManager.updateDataBounds(1, 300)
         }
     }
 

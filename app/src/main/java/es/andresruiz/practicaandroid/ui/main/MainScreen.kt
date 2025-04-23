@@ -2,29 +2,17 @@ package es.andresruiz.practicaandroid.ui.main
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -40,17 +28,14 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(
-    navController: NavController
-    ) {
-
+fun MainScreen(navController: NavController) {
     val context = LocalContext.current.applicationContext as PracticaAndroidApplication
     val dataStore = context.dataStore
     val coroutineScope = remember { CoroutineScope(Dispatchers.IO) }
 
     var useMock by remember { mutableStateOf(false) }
 
-    // Consulto en DataStore el estado de use_mock (para activar o no los Mocks)
+    // Consulto en DataStore el estado de use_mock
     LaunchedEffect(Unit) {
         dataStore.data.collect { preferences ->
             useMock = preferences[booleanPreferencesKey("use_mock")] == true
@@ -59,89 +44,230 @@ fun MainScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            LargeTopAppBar(
                 title = {
-                    Image(
-                        painter = painterResource(id = R.drawable.iber_logo),
-                        contentDescription = "Logo de la aplicación"
-                    )
-                }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.iber_logo),
+                            contentDescription = "Logo de la aplicación",
+                            modifier = Modifier
+                                .height(56.dp)
+                                .padding(vertical = 8.dp)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                )
             )
         },
-        modifier = Modifier.fillMaxSize()
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.Center,
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            HomeButtons(modifier = Modifier, navController)
+            // Título de bienvenida
+            Text(
+                text = "Bienvenido a tu app",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                ),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Usar sistema de Mocks",
-                    modifier = Modifier.padding(end = 12.dp)
-                )
-                Switch(
-                    checked = useMock,
-                    onCheckedChange = { isChecked ->
-                        useMock = isChecked
-                        coroutineScope.launch {
-                            dataStore.edit { preferences ->
-                                preferences[booleanPreferencesKey("use_mock")] = isChecked
-                            }
+            // Tarjetas de opciones principales
+            HomeButtons(
+                modifier = Modifier.fillMaxWidth(),
+                navController = navController
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Sección de configuración
+            DevSettingsCard(
+                useMock = useMock,
+                onToggleMock = { isChecked ->
+                    useMock = isChecked
+                    coroutineScope.launch {
+                        dataStore.edit { preferences ->
+                            preferences[booleanPreferencesKey("use_mock")] = isChecked
                         }
-                        Toast.makeText(
-                            context,
-                            if (isChecked) "Sistema de mocks activado" else "Sistema de mocks desactivado",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
-                )
-            }
+                    Toast.makeText(
+                        context,
+                        if (isChecked) "Sistema de mocks activado" else "Sistema de mocks desactivado",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeButtons(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
     Column(
-        modifier.padding(horizontal = 32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Button(
-            onClick = {
-                navController.navigate(Facturas)
-            },
-            modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
+        // Facturas Card
+        ElevatedCard(
+            onClick = { navController.navigate(Facturas) },
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                text = stringResource(R.string.facturas)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_facturas),
+                    contentDescription = "Icono de facturas",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
+                Column {
+                    Text(
+                        text = stringResource(R.string.facturas),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Gestiona tus facturas",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
-        Button(
-            onClick = {
-                navController.navigate(SmartSolar)
-            },
-            modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
+
+        // Smart Solar Card
+        ElevatedCard(
+            onClick = { navController.navigate(SmartSolar) },
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                text = stringResource(R.string.smart_solar)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_smart_solar),
+                    contentDescription = "Icono de Smart Solar",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
+                Column {
+                    Text(
+                        text = stringResource(R.string.smart_solar),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Monitoriza tu energía solar",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DevSettingsCard(
+    useMock: Boolean,
+    onToggleMock: (Boolean) -> Unit
+) {
+    OutlinedCard(
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 24.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_dev),
+                    contentDescription = "Configuración de desarrollo",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Configuración de desarrollo",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Divider(
+                modifier = Modifier.padding(vertical = 8.dp),
+                color = MaterialTheme.colorScheme.secondary
             )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = "Usar sistema de Mocks",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "Activar para usar datos de prueba",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+                Switch(
+                    checked = useMock,
+                    onCheckedChange = onToggleMock,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                )
+            }
         }
     }
 }

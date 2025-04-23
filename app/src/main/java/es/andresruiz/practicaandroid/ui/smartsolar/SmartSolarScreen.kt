@@ -6,13 +6,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -175,7 +178,7 @@ fun EnergiaScreen() {
 @Composable
 fun DetallesScreen(viewModel: DetallesViewModel = viewModel()) {
 
-    val detalles = viewModel.detalles.collectAsState().value
+    val uiState by viewModel.uiState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -183,41 +186,61 @@ fun DetallesScreen(viewModel: DetallesViewModel = viewModel()) {
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        DetallesTextField(
-            label = "CAU (Código Autoconsumo)",
-            text = detalles?.cau ?: "Cargando...",
-            onValueChange = {},
-            showDialog = {}
-        )
+        when (val state = uiState) {
+            is DetallesUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is DetallesUiState.Success -> {
+                val detalles = state.detalles
 
-        DetallesTextField(
-            label = "Estado solicitud alta autoconsumidor",
-            text = detalles?.estadoSolicitud ?: "Cargando...",
-            onValueChange = {},
-            showDialog = { showDialog = true },
-            infoIcon = true
-        )
+                DetallesTextField(
+                    label = "CAU (Código Autoconsumo)",
+                    text = detalles.cau,
+                    onValueChange = {},
+                    showDialog = {}
+                )
 
-        DetallesTextField(
-            label = "Tipo autoconsumo",
-            text = detalles?.tipoAutoconsumo ?: "Cargando...",
-            onValueChange = {},
-            showDialog = {}
-        )
+                DetallesTextField(
+                    label = "Estado solicitud alta autoconsumidor",
+                    text = detalles.estadoSolicitud,
+                    onValueChange = {},
+                    showDialog = { showDialog = true },
+                    infoIcon = true
+                )
 
-        DetallesTextField(
-            label = "Compensación de excedentes",
-            text = detalles?.compensacionExcendentes ?: "Cargando...",
-            onValueChange = {},
-            showDialog = {}
-        )
+                DetallesTextField(
+                    label = "Tipo autoconsumo",
+                    text = detalles.tipoAutoconsumo,
+                    onValueChange = {},
+                    showDialog = {}
+                )
 
-        DetallesTextField(
-            label = "Potencia de instalación",
-            text = detalles?.potenciaInstalacion ?: "Cargando...",
-            onValueChange = {},
-            showDialog = {}
-        )
+                DetallesTextField(
+                    label = "Compensación de excedentes",
+                    text = detalles.compensacionExcendentes,
+                    onValueChange = {},
+                    showDialog = {}
+                )
+
+                DetallesTextField(
+                    label = "Potencia de instalación",
+                    text = detalles.potenciaInstalacion,
+                    onValueChange = {},
+                    showDialog = {}
+                )
+            }
+            is DetallesUiState.Error -> {
+                ErrorView(
+                    message = state.message,
+                    onRetry = { viewModel.retry() }
+                )
+            }
+        }
     }
 
     if (showDialog) {
@@ -306,7 +329,7 @@ private fun DetallesTextField(
                                 Icon(
                                     painter = painterResource(R.drawable.ic_info),
                                     contentDescription = "Información",
-                                    tint = Color(0xFF2196F3)
+                                    tint = Color(0xFF549BFF)
                                 )
                             }
                         }
@@ -319,4 +342,38 @@ private fun DetallesTextField(
             }
         }
     )
+}
+
+@Composable
+fun ErrorView(
+    message: String,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "¡Ups! Algo salió mal",
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = onRetry) {
+            Text("Reintentar")
+        }
+    }
 }

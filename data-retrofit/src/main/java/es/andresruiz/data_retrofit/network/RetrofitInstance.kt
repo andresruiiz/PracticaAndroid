@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 @SuppressLint("StaticFieldLeak")
 object RetrofitInstance {
-    private const val BASE_URL = "https://d25ffc74-c8b3-45aa-9094-eb029fba47a0.mock.pstmn.io"
+    private const val BASE_URL = "https://5e39f79a-1210-4746-b61f-4671459628b8.mock.pstmn.io"
 
     private lateinit var context: Context
     private lateinit var useMockProvider: UseMockProvider

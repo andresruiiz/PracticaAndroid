@@ -2,20 +2,19 @@ package es.andresruiz.practicaandroid.ui.smartsolar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import es.andresruiz.data_retrofit.network.RetrofitInstance
+import dagger.hilt.android.lifecycle.HiltViewModel
 import es.andresruiz.data_retrofit.repository.DetallesRepository
-import es.andresruiz.data_retrofit.repository.NetworkDetallesRepository
 import es.andresruiz.domain.models.Detalles
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DetallesViewModel() : ViewModel() {
-
-    private val detallesRepository = NetworkDetallesRepository(
-        RetrofitInstance.facturasApiService
-    )
+@HiltViewModel
+class DetallesViewModel @Inject constructor(
+    private val detallesRepository: DetallesRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DetallesUiState>(DetallesUiState.Loading)
     val uiState: StateFlow<DetallesUiState> = _uiState.asStateFlow()

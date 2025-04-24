@@ -1,25 +1,25 @@
 package es.andresruiz.practicaandroid.ui.facturas
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import es.andresruiz.data_retrofit.database.FacturasRepositoryProvider
+import dagger.hilt.android.lifecycle.HiltViewModel
 import es.andresruiz.data_retrofit.repository.FacturasRepository
 import es.andresruiz.domain.models.Factura
 import es.andresruiz.practicaandroid.ui.filtros.FilterManager
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class FacturasViewModel(private val repository: FacturasRepository) : ViewModel() {
-
-    private val filterManager = FilterManager.getInstance()
+@HiltViewModel
+class FacturasViewModel @Inject constructor(
+    private val repository: FacturasRepository,
+    private val filterManager: FilterManager
+) : ViewModel() {
 
     // Estado de todas las facturas (sin filtrar)
     private val _allFacturas = MutableStateFlow<List<Factura>>(emptyList())
@@ -107,20 +107,5 @@ class FacturasViewModel(private val repository: FacturasRepository) : ViewModel(
 
     fun hideDialog() {
         _showDialog.value = false
-    }
-
-    companion object {
-        fun provideFactory(context: Context): ViewModelProvider.Factory {
-            val repository = FacturasRepositoryProvider.provideRepository(context)
-            return object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(FacturasViewModel::class.java)) {
-                        @Suppress("UNCHECKED_CAST")
-                        return FacturasViewModel(repository) as T
-                    }
-                    throw IllegalArgumentException("Unknown ViewModel class")
-                }
-            }
-        }
     }
 }

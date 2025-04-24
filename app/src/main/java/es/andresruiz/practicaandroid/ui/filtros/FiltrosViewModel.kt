@@ -2,18 +2,19 @@ package es.andresruiz.practicaandroid.ui.filtros
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import es.andresruiz.domain.models.FilterState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
-class FiltrosViewModel : ViewModel() {
-
-    // Usamos el FilterManager para obtener y actualizar el estado compartido
-    private val filterManager = FilterManager.getInstance()
+@HiltViewModel
+class FiltrosViewModel @Inject constructor(
+    private val filterManager: FilterManager
+) : ViewModel() {
 
     val actualMinImporte: StateFlow<Int> = filterManager.dataMinImporte
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)

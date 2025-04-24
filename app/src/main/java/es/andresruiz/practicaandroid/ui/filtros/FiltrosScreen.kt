@@ -54,7 +54,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import es.andresruiz.core.utils.convertMillisToDate
 import es.andresruiz.practicaandroid.R
@@ -65,7 +65,7 @@ import es.andresruiz.practicaandroid.ui.components.TopBar
 @Composable
 fun FiltrosScreen(
     navController: NavController,
-    viewModel: FiltrosViewModel = viewModel()
+    viewModel: FiltrosViewModel = hiltViewModel()
 ) {
 
     val fechaDesde by viewModel.fechaDesde.collectAsState()

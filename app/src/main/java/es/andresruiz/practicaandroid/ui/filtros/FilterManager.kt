@@ -4,8 +4,11 @@ import es.andresruiz.domain.models.FilterState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class FilterManager private constructor() {
+@Singleton
+class FilterManager @Inject constructor() {
     private val _filterState = MutableStateFlow(FilterState())
     val filterState: StateFlow<FilterState> = _filterState.asStateFlow()
 
@@ -47,16 +50,5 @@ class FilterManager private constructor() {
             importeMax = _dataMaxImporte.value
         )
         _filtersApplied.value = false
-    }
-
-    companion object {
-        @Volatile
-        private var instance: FilterManager? = null
-
-        fun getInstance(): FilterManager {
-            return instance ?: synchronized(this) {
-                instance ?: FilterManager().also { instance = it }
-            }
-        }
     }
 }

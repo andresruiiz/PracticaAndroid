@@ -11,6 +11,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel para la pantalla de detalles de SmartSolar
+ * Gestiona la carga y visualización de los detalles de la instalación
+ */
 @HiltViewModel
 class DetallesViewModel @Inject constructor(
     private val detallesRepository: DetallesRepository
@@ -28,7 +32,12 @@ class DetallesViewModel @Inject constructor(
             _uiState.value = DetallesUiState.Loading
             try {
                 val detalles = detallesRepository.getDetalles()
-                _uiState.value = DetallesUiState.Success(detalles)
+
+                if (detalles.cau.isBlank() && detalles.estadoSolicitud.isBlank()) {
+                    _uiState.value = DetallesUiState.Empty("No hay detalles disponibles para mostrar")
+                } else {
+                    _uiState.value = DetallesUiState.Success(detalles)
+                }
             } catch (e: Exception) {
                 _uiState.value = DetallesUiState.Error(e.message ?: "Error al cargar los detalles")
             }
@@ -41,8 +50,12 @@ class DetallesViewModel @Inject constructor(
     }
 }
 
+/**
+ * Estados posibles de la UI de Detalles
+ */
 sealed class DetallesUiState {
     data object Loading : DetallesUiState()
     data class Success(val detalles: Detalles) : DetallesUiState()
+    data class Empty(val message: String) : DetallesUiState()
     data class Error(val message: String) : DetallesUiState()
 }

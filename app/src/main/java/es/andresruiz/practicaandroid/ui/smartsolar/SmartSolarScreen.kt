@@ -1,26 +1,13 @@
 package es.andresruiz.practicaandroid.ui.smartsolar
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
@@ -38,8 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -47,9 +32,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import es.andresruiz.practicaandroid.R
+import es.andresruiz.practicaandroid.ui.components.EmptyStateView
+import es.andresruiz.practicaandroid.ui.components.ErrorView
+import es.andresruiz.practicaandroid.ui.components.InfoDialog
+import es.andresruiz.practicaandroid.ui.components.LoadingView
+import es.andresruiz.practicaandroid.ui.components.ReadOnlyTextField
 import es.andresruiz.practicaandroid.ui.components.TopBar
 
 
@@ -189,52 +178,44 @@ fun DetallesScreen(viewModel: DetallesViewModel = hiltViewModel()) {
     ) {
         when (val state = uiState) {
             is DetallesUiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+                LoadingView()
             }
+
             is DetallesUiState.Success -> {
                 val detalles = state.detalles
 
-                DetallesTextField(
+                ReadOnlyTextField(
                     label = "CAU (Código Autoconsumo)",
-                    text = detalles.cau,
-                    onValueChange = {},
-                    showDialog = {}
+                    text = detalles.cau
                 )
 
-                DetallesTextField(
+                ReadOnlyTextField(
                     label = "Estado solicitud alta autoconsumidor",
                     text = detalles.estadoSolicitud,
-                    onValueChange = {},
-                    showDialog = { showDialog = true },
+                    onInfoClick = { showDialog = true },
                     infoIcon = true
                 )
 
-                DetallesTextField(
+                ReadOnlyTextField(
                     label = "Tipo autoconsumo",
-                    text = detalles.tipoAutoconsumo,
-                    onValueChange = {},
-                    showDialog = {}
+                    text = detalles.tipoAutoconsumo
                 )
 
-                DetallesTextField(
+                ReadOnlyTextField(
                     label = "Compensación de excedentes",
-                    text = detalles.compensacionExcendentes,
-                    onValueChange = {},
-                    showDialog = {}
+                    text = detalles.compensacionExcendentes
                 )
 
-                DetallesTextField(
+                ReadOnlyTextField(
                     label = "Potencia de instalación",
-                    text = detalles.potenciaInstalacion,
-                    onValueChange = {},
-                    showDialog = {}
+                    text = detalles.potenciaInstalacion
                 )
             }
+
+            is DetallesUiState.Empty -> {
+                EmptyStateView(message = state.message)
+            }
+
             is DetallesUiState.Error -> {
                 ErrorView(
                     message = state.message,
@@ -245,136 +226,11 @@ fun DetallesScreen(viewModel: DetallesViewModel = hiltViewModel()) {
     }
 
     if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = {
-                Text(
-                    text = "Estado solicitud autoconsumo",
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            },
-            text = {
-                Text(
-                    text = "El tiempo estimado de activación de tu autoconsumo es de 1 a 2 meses, éste variará en función de tu comunidad autónoma y distribuidora",
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-            },
-            shape = RectangleShape,
-            confirmButton = {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Button(
-                        onClick = { showDialog = false },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp)
-                    ) {
-                        Text("Aceptar")
-                    }
-                }
-            }
+        InfoDialog(
+            title = "Estado solicitud autoconsumo",
+            message = "El tiempo estimado de activación de tu autoconsumo es de 1 a 2 meses, éste variará en función de tu comunidad autónoma y distribuidora",
+            buttonText = "Aceptar",
+            onDismiss = { showDialog = false }
         )
-    }
-}
-
-@Composable
-private fun DetallesTextField(
-    label: String,
-    text: String,
-    onValueChange: (String) -> Unit,
-    infoIcon: Boolean = false,
-    showDialog: () -> Unit
-) {
-    BasicTextField(
-        enabled = false,
-        value = text,
-        onValueChange = onValueChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = Color.Transparent,
-                shape = MaterialTheme.shapes.small
-            )
-            .padding(bottom = 32.dp),
-        textStyle = LocalTextStyle.current.copy(
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Start
-        ),
-        decorationBox = { innerTextField ->
-            Column {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                ) {
-                    innerTextField()
-                    if (infoIcon) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                        ) {
-                            IconButton(
-                                onClick = { showDialog() },
-                                modifier = Modifier.size(24.dp)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_info),
-                                    contentDescription = "Información",
-                                    tint = Color(0xFF549BFF)
-                                )
-                            }
-                        }
-                    }
-                }
-                Divider(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color.Gray
-                )
-            }
-        }
-    )
-}
-
-@Composable
-fun ErrorView(
-    message: String,
-    onRetry: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "¡Ups! Algo salió mal",
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = onRetry) {
-            Text("Reintentar")
-        }
     }
 }

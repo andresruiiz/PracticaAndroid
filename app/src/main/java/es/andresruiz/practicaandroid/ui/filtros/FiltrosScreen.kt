@@ -22,8 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
@@ -46,7 +44,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
@@ -58,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import es.andresruiz.core.utils.convertMillisToDate
 import es.andresruiz.practicaandroid.R
+import es.andresruiz.practicaandroid.ui.components.CheckboxItem
 import es.andresruiz.practicaandroid.ui.components.TopBar
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -475,31 +473,5 @@ fun ButtonsSection(
         ) {
             Text("Eliminar filtros")
         }
-    }
-}
-
-@Composable
-fun CheckboxItem(
-    text: String,
-    isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp)
-    ) {
-        Checkbox(
-            checked = isChecked,
-            onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(
-                checkedColor = Color(0xFF8BC34A),
-                uncheckedColor = Color(0xFFE0E0E0)
-            )
-        )
-        Text(
-            text = text
-        )
     }
 }

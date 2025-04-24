@@ -24,17 +24,13 @@ class FacturasViewModel @Inject constructor(
     // Estado de todas las facturas (sin filtrar)
     private val _allFacturas = MutableStateFlow<List<Factura>>(emptyList())
 
-    // Estado de las facturas filtradas que se muestran
-    private val _facturas = MutableStateFlow<List<Factura>>(emptyList())
-    val facturas: StateFlow<List<Factura>> = _facturas.asStateFlow()
+    // Estado de la UI
+    private val _uiState = MutableStateFlow<FacturasUiState>(FacturasUiState.Loading)
+    val uiState: StateFlow<FacturasUiState> = _uiState.asStateFlow()
 
     // Estado del popup
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
-
-    // Estado de carga
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
         loadFacturasFromDatabase()
@@ -42,24 +38,41 @@ class FacturasViewModel @Inject constructor(
         // Observar cambios en los filtros
         viewModelScope.launch {
             filterManager.filterState.collectLatest { filterState ->
-                _facturas.value = filterState.aplicarFiltros(_allFacturas.value)
+                if (_allFacturas.value.isNotEmpty()) {
+                    updateUiState(
+                        FacturasUiState.Success(
+                            filterState.aplicarFiltros(_allFacturas.value)
+                        )
+                    )
+                }
             }
         }
     }
 
     private fun loadFacturasFromDatabase() {
+
+        _uiState.value = FacturasUiState.Loading
+
         viewModelScope.launch {
-            repository.getFacturas().collect { facturas ->
-                if (facturas.isEmpty() && !_isLoading.value) {
-                    // Cargo las facturas desde la API si la base de datos está vacía
-                    refreshFacturas()
-                } else {
-                    _allFacturas.value = facturas
-                    // Calculo y actualizo los límites en FilterManager
-                    updateFilterManagerBounds(facturas)
-                    // Aplico los filtros actuales a las facturas cargadas
-                    _facturas.value = filterManager.getCurrentFilter().aplicarFiltros(facturas)
+            try {
+                repository.getFacturas().collect { facturas ->
+                    if (facturas.isEmpty()) {
+                        // Cargo las facturas desde la API si la base de datos está vacía
+                        refreshFacturas()
+                    } else {
+                        _allFacturas.value = facturas
+                        // Calculo y actualizo los límites en FilterManager
+                        updateFilterManagerBounds(facturas)
+                        // Aplico los filtros actuales a las facturas cargadas
+                        updateUiState(
+                            FacturasUiState.Success(
+                                filterManager.getCurrentFilter().aplicarFiltros(facturas)
+                            )
+                        )
+                    }
                 }
+            } catch (e: Exception) {
+                updateUiState(FacturasUiState.Error("Error al cargar las facturas: ${e.message ?: "Error desconocido"}"))
             }
         }
     }
@@ -86,19 +99,25 @@ class FacturasViewModel @Inject constructor(
         }
     }
 
+    private fun updateUiState(newState: FacturasUiState) {
+        _uiState.value = newState
+    }
+
     fun refreshFacturas() {
-        if (_isLoading.value) return
+        if (_uiState.value is FacturasUiState.Loading) return
 
         viewModelScope.launch {
-            _isLoading.value = true
+            _uiState.value = FacturasUiState.Loading
             try {
                 repository.refreshFacturas()
             } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                _isLoading.value = false
+                updateUiState(FacturasUiState.Error("Error al refrescar las facturas: ${e.message ?: "Error desconocido"}"))
             }
         }
+    }
+
+    fun retry() {
+        refreshFacturas()
     }
 
     fun showDialog() {
@@ -107,5 +126,11 @@ class FacturasViewModel @Inject constructor(
 
     fun hideDialog() {
         _showDialog.value = false
+    }
+
+    sealed class FacturasUiState {
+        data object Loading: FacturasUiState()
+        data class Success(val facturas: List<Factura>): FacturasUiState()
+        data class Error(val message: String): FacturasUiState()
     }
 }

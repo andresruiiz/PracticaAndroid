@@ -14,6 +14,13 @@ val Application.dataStore by preferencesDataStore(name = "settings")
 class PracticaAndroidApplication : Application(), UseMockProvider {
 
     override fun isMockEnabled(): Boolean {
+
+        // En producción, siempre Retrofit (false)
+        if (!BuildConfig.DEBUG) {
+            return false
+        }
+
+        // En DEBUG, comprobar si el sistema de mocks está activado
         val key = booleanPreferencesKey("use_mock")
         return runBlocking {
             dataStore.data.first()[key] == true

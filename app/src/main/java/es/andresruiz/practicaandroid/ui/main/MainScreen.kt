@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.navigation.NavController
+import es.andresruiz.practicaandroid.BuildConfig
 import es.andresruiz.practicaandroid.PracticaAndroidApplication
 import es.andresruiz.practicaandroid.R
 import es.andresruiz.practicaandroid.dataStore
@@ -35,10 +36,12 @@ fun MainScreen(navController: NavController) {
 
     var useMock by remember { mutableStateOf(false) }
 
-    // Consulto en DataStore el estado de use_mock
-    LaunchedEffect(Unit) {
-        dataStore.data.collect { preferences ->
-            useMock = preferences[booleanPreferencesKey("use_mock")] == true
+    // Consulto en DataStore el estado de use_mock (solo en DEBUG)
+    if (BuildConfig.DEBUG) {
+        LaunchedEffect(Unit) {
+            dataStore.data.collect { preferences ->
+                useMock = preferences[booleanPreferencesKey("use_mock")] == true
+            }
         }
     }
 
@@ -95,23 +98,25 @@ fun MainScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Sección de configuración
-            DevSettingsCard(
-                useMock = useMock,
-                onToggleMock = { isChecked ->
-                    useMock = isChecked
-                    coroutineScope.launch {
-                        dataStore.edit { preferences ->
-                            preferences[booleanPreferencesKey("use_mock")] = isChecked
+            // Sección de configuración (solo en DEBUG)
+            if (BuildConfig.DEBUG) {
+                DevSettingsCard(
+                    useMock = useMock,
+                    onToggleMock = { isChecked ->
+                        useMock = isChecked
+                        coroutineScope.launch {
+                            dataStore.edit { preferences ->
+                                preferences[booleanPreferencesKey("use_mock")] = isChecked
+                            }
                         }
+                        Toast.makeText(
+                            context,
+                            if (isChecked) "Sistema de mocks activado" else "Sistema de mocks desactivado",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                    Toast.makeText(
-                        context,
-                        if (isChecked) "Sistema de mocks activado" else "Sistema de mocks desactivado",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            )
+                )
+            }
         }
     }
 }

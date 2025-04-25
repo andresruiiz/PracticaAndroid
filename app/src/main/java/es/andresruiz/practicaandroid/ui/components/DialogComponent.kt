@@ -11,8 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import es.andresruiz.practicaandroid.R
 
 /**
  * Componente de diálogo informativo reutilizable
@@ -21,7 +23,7 @@ import androidx.compose.ui.unit.dp
 fun InfoDialog(
     title: String,
     message: String,
-    buttonText: String = "Cerrar",
+    buttonText: String = stringResource(R.string.cerrar),
     onDismiss: () -> Unit
 ) {
     AlertDialog(

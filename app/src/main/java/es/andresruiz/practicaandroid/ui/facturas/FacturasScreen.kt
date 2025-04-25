@@ -90,8 +90,8 @@ fun FacturasScreen(
 
     if (showDialog) {
         InfoDialog(
-            title = "Información",
-            message = "Esta funcionalidad aún no está disponible",
+            title = stringResource(R.string.informacion),
+            message = stringResource(R.string.dialog_message),
             onDismiss = { viewModel.hideDialog() }
         )
     }

@@ -49,7 +49,7 @@ fun SmartSolarScreen(navController: NavController) {
     // Estado para controlar la pestaña seleccionada
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-    val tabs = listOf("Mi instalación", "Energía", "Detalles")
+    val tabs = listOf(stringResource(R.string.mi_instalacion), stringResource(R.string.energia), stringResource(R.string.detalles))
 
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -117,23 +117,23 @@ fun MiInstalacionScreen() {
             .padding(16.dp)
     ) {
         Text(
-            text = "Aquí tienes los datos de tu instalación fotovoltaica en tiempo real.",
+            text = stringResource(R.string.texto_instalacion),
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
         Row(modifier = Modifier.padding(bottom = 8.dp)) {
             Text(
-                text = "Autoconsumo: ",
+                text = stringResource(R.string.autoconsumo),
                 color = MaterialTheme.colorScheme.secondary
             )
             Text(
-                text = "92%"
+                text = stringResource(R.string.porc_instalacion)
             )
         }
 
         Image(
             painter = painterResource(R.drawable.grafico1),
-            contentDescription = "Gráfico de autoconsumo",
+            contentDescription = stringResource(R.string.desc_graf_autoconsumo),
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.Crop
         )
@@ -151,7 +151,7 @@ fun EnergiaScreen() {
     ) {
         Image(
             painter = painterResource(R.drawable.plan_gestiones),
-            contentDescription = "Gráfico de página en mantenimiento",
+            contentDescription = stringResource(R.string.desc_graf_mantenimiento),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 32.dp),
@@ -159,7 +159,7 @@ fun EnergiaScreen() {
         )
 
         Text(
-            text = "Estamos trabajando en mejorar la App. Tus paneles solares siguen produciendo, en breve podrás seguir viendo tu producción solar. Sentimos las molestias.",
+            text = stringResource(R.string.texto_energia),
             textAlign = TextAlign.Center
         )
     }
@@ -185,29 +185,29 @@ fun DetallesScreen(viewModel: DetallesViewModel = hiltViewModel()) {
                 val detalles = state.detalles
 
                 ReadOnlyTextField(
-                    label = "CAU (Código Autoconsumo)",
+                    label = stringResource(R.string.cau),
                     text = detalles.cau
                 )
 
                 ReadOnlyTextField(
-                    label = "Estado solicitud alta autoconsumidor",
+                    label = stringResource(R.string.estado_solicitud),
                     text = detalles.estadoSolicitud,
                     onInfoClick = { showDialog = true },
                     infoIcon = true
                 )
 
                 ReadOnlyTextField(
-                    label = "Tipo autoconsumo",
+                    label = stringResource(R.string.tipo_autoconsumo),
                     text = detalles.tipoAutoconsumo
                 )
 
                 ReadOnlyTextField(
-                    label = "Compensación de excedentes",
+                    label = stringResource(R.string.compensacion_excedentes),
                     text = detalles.compensacionExcendentes
                 )
 
                 ReadOnlyTextField(
-                    label = "Potencia de instalación",
+                    label = stringResource(R.string.potencia_instalacion),
                     text = detalles.potenciaInstalacion
                 )
             }
@@ -227,9 +227,9 @@ fun DetallesScreen(viewModel: DetallesViewModel = hiltViewModel()) {
 
     if (showDialog) {
         InfoDialog(
-            title = "Estado solicitud autoconsumo",
-            message = "El tiempo estimado de activación de tu autoconsumo es de 1 a 2 meses, éste variará en función de tu comunidad autónoma y distribuidora",
-            buttonText = "Aceptar",
+            title = stringResource(R.string.titulo_dialog_detalles),
+            message = stringResource(R.string.mensaje_dialog_detalles),
+            buttonText = stringResource(R.string.aceptar),
             onDismiss = { showDialog = false }
         )
     }

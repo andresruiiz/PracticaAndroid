@@ -172,7 +172,7 @@ fun DateFilterSection(
     var showEndDatePicker by remember { mutableStateOf(false) }
 
     Text(
-        text = "Con fecha de emisión",
+        text = stringResource(R.string.con_fecha_emision),
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
@@ -186,14 +186,14 @@ fun DateFilterSection(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Desde:",
+                text = stringResource(R.string.desde),
                 color = MaterialTheme.colorScheme.secondary,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             SimpleDateField(
                 value = fechaDesde,
-                placeholder = "día/mes/año",
+                placeholder = stringResource(R.string.dia_mes_anyo),
                 onClick = { showStartDatePicker = true }
             )
         }
@@ -205,14 +205,14 @@ fun DateFilterSection(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Hasta:",
+                text = stringResource(R.string.hasta),
                 color = MaterialTheme.colorScheme.secondary,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             SimpleDateField(
                 value = fechaHasta,
-                placeholder = "día/mes/año",
+                placeholder = stringResource(R.string.dia_mes_anyo),
                 onClick = { showEndDatePicker = true }
             )
         }
@@ -251,7 +251,6 @@ fun SimpleDateField(
 ) {
     Box(
         modifier = Modifier
-            //.fillMaxWidth()
             .height(38.dp)
             .background(
                 color = MaterialTheme.colorScheme.secondary,
@@ -292,7 +291,7 @@ fun DatePickerModal(
                 onClick = onDismiss
             ) {
                 Text(
-                    text = "Cancelar",
+                    text = stringResource(R.string.cancelar),
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
@@ -323,7 +322,7 @@ fun AmountFilterSection(
     val sliderValueRange = validActualMin..validActualMax
 
     Text(
-        text = "Por un importe",
+        text = stringResource(R.string.por_importe),
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         modifier = Modifier.padding(bottom = 16.dp)
@@ -407,38 +406,38 @@ fun StatusFilterSection(
     onPlanPagoChange: (Boolean) -> Unit
 ) {
     Text(
-        text = "Por estado",
+        text = stringResource(R.string.por_estado),
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         modifier = Modifier.padding(bottom = 6.dp)
     )
 
     CheckboxItem(
-        text = "Pagadas",
+        text = stringResource(R.string.pagadas),
         isChecked = isPagadasChecked,
         onCheckedChange = onPagadasChange
     )
 
     CheckboxItem(
-        text = "Anuladas",
+        text = stringResource(R.string.anuladas),
         isChecked = isAnuladasChecked,
         onCheckedChange = onAnuladasChange
     )
 
     CheckboxItem(
-        text = "Cuota Fija",
+        text = stringResource(R.string.cuota_fija),
         isChecked = isCuotaFijaChecked,
         onCheckedChange = onCuotaFijaChange
     )
 
     CheckboxItem(
-        text = "Pendientes de pago",
+        text = stringResource(R.string.pendientes),
         isChecked = isPendientesChecked,
         onCheckedChange = onPendientesChange
     )
 
     CheckboxItem(
-        text = "Plan de pago",
+        text = stringResource(R.string.plan_pago),
         isChecked = isPlanPagoChecked,
         onCheckedChange = onPlanPagoChange
     )
@@ -462,7 +461,7 @@ fun ButtonsSection(
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp)
         ) {
-            Text("Aplicar")
+            Text(stringResource(R.string.aplicar))
         }
 
         TextButton(
@@ -471,7 +470,7 @@ fun ButtonsSection(
                 contentColor = MaterialTheme.colorScheme.secondary
             )
         ) {
-            Text("Eliminar filtros")
+            Text(stringResource(R.string.eliminar_filtros))
         }
     }
 }

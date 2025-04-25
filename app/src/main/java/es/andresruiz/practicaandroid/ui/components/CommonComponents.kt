@@ -14,8 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import es.andresruiz.practicaandroid.R
 
 /**
  * Componente reutilizable para mostrar estados de error
@@ -34,7 +36,7 @@ fun ErrorView(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "¡Ups! Algo salió mal",
+            text = stringResource(R.string.mensaje_error),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
         )
@@ -50,7 +52,7 @@ fun ErrorView(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = onRetry) {
-            Text("Reintentar")
+            Text(stringResource(R.string.reintentar))
         }
     }
 }
@@ -76,7 +78,7 @@ fun LoadingView(
 @Composable
 fun EmptyStateView(
     modifier: Modifier = Modifier,
-    message: String = "No hay datos disponibles"
+    message: String = stringResource(R.string.no_datos)
 ) {
     Box(
         modifier = modifier.fillMaxSize(),

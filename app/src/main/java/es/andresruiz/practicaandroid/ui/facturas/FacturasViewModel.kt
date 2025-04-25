@@ -9,7 +9,6 @@ import es.andresruiz.practicaandroid.ui.filtros.FilterManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,13 +28,25 @@ class FacturasViewModel @Inject constructor(
     // Estado de todas las facturas (sin filtrar)
     private val _allFacturas = MutableStateFlow<List<Factura>>(emptyList())
 
-    // Estado de la UI
-    private val _uiState = MutableStateFlow<FacturasUiState>(FacturasUiState.Loading)
-    val uiState: StateFlow<FacturasUiState> = _uiState.asStateFlow()
+    // Estado de las facturas filtradas que se muestran
+    private val _facturas = MutableStateFlow<List<Factura>>(emptyList())
+    val facturas: StateFlow<List<Factura>> = _facturas.asStateFlow()
 
     // Estado del popup
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
+
+    // Estado de carga
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    // Estado de error
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
+
+    // Estado de vacío
+    private val _isEmpty = MutableStateFlow(false)
+    val isEmpty: StateFlow<Boolean> = _isEmpty.asStateFlow()
 
     init {
         loadFacturasFromDatabase()
@@ -43,57 +54,33 @@ class FacturasViewModel @Inject constructor(
         // Observar cambios en los filtros
         viewModelScope.launch {
             filterManager.filterState.collectLatest { filterState ->
-                if (_allFacturas.value.isNotEmpty()) {
-                    val filteredFacturas = filterState.aplicarFiltros(_allFacturas.value)
-
-                    if (filteredFacturas.isEmpty()) {
-                        _uiState.value = FacturasUiState.Empty(
-                            "No hay facturas que coincidan con los filtros seleccionados"
-                        )
-                    } else {
-                        _uiState.value = FacturasUiState.Success(filteredFacturas)
-                    }
-                }
+                val filteredFacturas = filterState.aplicarFiltros(_allFacturas.value)
+                _facturas.value = filteredFacturas
+                _isEmpty.value = filteredFacturas.isEmpty() && _allFacturas.value.isNotEmpty()
             }
         }
     }
 
     private fun loadFacturasFromDatabase() {
-
-        _uiState.value = FacturasUiState.Loading
-
         viewModelScope.launch {
             try {
-                repository.getFacturas()
-                    .catch { e ->
-                        _uiState.value = FacturasUiState.Error("Error al cargar las facturas: ${e.message ?: "Error desconocido"}")
+                repository.getFacturas().collect { facturas ->
+                    if (facturas.isEmpty() && !_isLoading.value) {
+                        // Cargo las facturas desde la API si la base de datos está vacía
+                        refreshFacturas()
+                    } else {
+                        _allFacturas.value = facturas
+                        // Calculo y actualizo los límites en FilterManager
+                        updateFilterManagerBounds(facturas)
+                        // Aplico los filtros actuales a las facturas cargadas
+                        val filteredFacturas = filterManager.getCurrentFilter().aplicarFiltros(facturas)
+                        _facturas.value = filteredFacturas
+                        _isEmpty.value = filteredFacturas.isEmpty() && facturas.isNotEmpty()
+                        _error.value = null
                     }
-                    .collect { facturas ->
-                        if (facturas.isEmpty()) {
-                            try {
-                                // Cargo las facturas desde la API si la base de datos está vacía
-                                refreshFacturas()
-                            } catch (e: Exception) {
-                                _uiState.value = FacturasUiState.Error("Error al refrescar las facturas: ${e.message ?: "Error desconocido"}")
-                            }
-                        } else {
-                            _allFacturas.value = facturas
-                            // Calculo y actualizo los límites en FilterManager
-                            updateFilterManagerBounds(facturas)
-                            // Aplico los filtros actuales a las facturas cargadas
-                            val filteredFacturas = filterManager.getCurrentFilter().aplicarFiltros(facturas)
-
-                            if (filteredFacturas.isEmpty()) {
-                                _uiState.value = FacturasUiState.Empty(
-                                    "No hay facturas que coincidan con los filtros seleccionados"
-                                )
-                            } else {
-                                _uiState.value = FacturasUiState.Success(filteredFacturas)
-                            }
-                        }
                 }
             } catch (e: Exception) {
-                updateUiState(FacturasUiState.Error("Error al cargar las facturas: ${e.message ?: "Error desconocido"}"))
+                _error.value = e.message ?: "Error desconocido al cargar facturas"
             }
         }
     }
@@ -120,19 +107,19 @@ class FacturasViewModel @Inject constructor(
         }
     }
 
-    private fun updateUiState(newState: FacturasUiState) {
-        _uiState.value = newState
-    }
-
     fun refreshFacturas() {
-        if (_uiState.value is FacturasUiState.Loading) return
+        if (_isLoading.value) return
 
         viewModelScope.launch {
-            _uiState.value = FacturasUiState.Loading
+            _isLoading.value = true
+            _error.value = null
+
             try {
                 repository.refreshFacturas()
             } catch (e: Exception) {
-                updateUiState(FacturasUiState.Error("Error al refrescar las facturas: ${e.message ?: "Error desconocido"}"))
+                _error.value = e.message ?: "Error desconocido al refrescar facturas"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -149,13 +136,56 @@ class FacturasViewModel @Inject constructor(
         _showDialog.value = false
     }
 
-    /**
-     * Estados posibles de la UI de Facturas
-     */
     sealed class FacturasUiState {
         data object Loading: FacturasUiState()
         data class Success(val facturas: List<Factura>): FacturasUiState()
         data class Empty(val message: String): FacturasUiState()
         data class Error(val message: String): FacturasUiState()
     }
+
+    // Convertir los estados separados al estado unificado para la UI
+    val uiState: StateFlow<FacturasUiState> = MutableStateFlow<FacturasUiState>(FacturasUiState.Loading).apply {
+        viewModelScope.launch {
+            launch {
+                _isLoading.collect { isLoading ->
+                    if (isLoading) {
+                        value = FacturasUiState.Loading
+                    } else if (_error.value != null) {
+                        value = FacturasUiState.Error(_error.value ?: "Error desconocido")
+                    } else if (_isEmpty.value) {
+                        value = FacturasUiState.Empty("No hay facturas que coincidan con los filtros seleccionados")
+                    } else if (_facturas.value.isNotEmpty()) {
+                        value = FacturasUiState.Success(_facturas.value)
+                    } else if (_facturas.value.isEmpty() && _allFacturas.value.isEmpty()) {
+                        // No hay facturas en absoluto
+                        value = FacturasUiState.Empty("No hay facturas disponibles")
+                    }
+                }
+            }
+
+            launch {
+                _error.collect { errorMsg ->
+                    if (errorMsg != null && !_isLoading.value) {
+                        value = FacturasUiState.Error(errorMsg)
+                    }
+                }
+            }
+
+            launch {
+                _isEmpty.collect { empty ->
+                    if (empty && !_isLoading.value && _error.value == null) {
+                        value = FacturasUiState.Empty("No hay facturas que coincidan con los filtros seleccionados")
+                    }
+                }
+            }
+
+            launch {
+                _facturas.collect { facturas ->
+                    if (facturas.isNotEmpty() && !_isLoading.value && _error.value == null) {
+                        value = FacturasUiState.Success(facturas)
+                    }
+                }
+            }
+        }
+    }.asStateFlow()
 }

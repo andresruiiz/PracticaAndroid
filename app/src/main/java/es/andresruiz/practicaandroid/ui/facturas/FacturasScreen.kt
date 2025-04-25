@@ -66,7 +66,7 @@ fun FacturasScreen(
             ) {
                 when (uiState) {
                     is FacturasUiState.Loading -> {
-                        LoadingView()
+                        // Cuando está cargando, no sale nada
                     }
                     is FacturasUiState.Success -> {
                         FacturasList(

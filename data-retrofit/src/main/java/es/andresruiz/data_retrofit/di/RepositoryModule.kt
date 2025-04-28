@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import es.andresruiz.data_retrofit.database.FacturaDao
-import es.andresruiz.data_retrofit.network.FacturasApiService
+import es.andresruiz.data_retrofit.network.FacturasApiServiceFactory
 import es.andresruiz.data_retrofit.repository.DetallesRepository
 import es.andresruiz.data_retrofit.repository.FacturasRepository
 import es.andresruiz.data_retrofit.repository.NetworkDetallesRepository
@@ -19,17 +19,17 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideFacturasRepository(
-        facturasApiService: FacturasApiService,
+        facturasApiServiceFactory: FacturasApiServiceFactory,
         facturaDao: FacturaDao
     ): FacturasRepository {
-        return NetworkFacturasRepository(facturasApiService, facturaDao)
+        return NetworkFacturasRepository(facturasApiServiceFactory, facturaDao)
     }
 
     @Provides
     @Singleton
     fun provideDetallesRepository(
-        facturasApiService: FacturasApiService
+        facturasApiServiceFactory: FacturasApiServiceFactory
     ): DetallesRepository {
-        return NetworkDetallesRepository(facturasApiService)
+        return NetworkDetallesRepository(facturasApiServiceFactory)
     }
 }

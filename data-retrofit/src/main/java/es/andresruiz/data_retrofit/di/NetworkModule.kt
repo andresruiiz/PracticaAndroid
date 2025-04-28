@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import es.andresruiz.data_retrofit.network.FacturasApiService
+import es.andresruiz.data_retrofit.network.FacturasApiServiceFactory
 import es.andresruiz.domain.UseMockProvider
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -42,16 +43,23 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideFacturasApiService(
+    fun provideFacturasApiServiceFactory(
         retrofit: Retrofit,
         retromock: Retromock,
         mockProvider: UseMockProvider
+    ): FacturasApiServiceFactory {
+        return FacturasApiServiceFactory(
+            retrofit.create(FacturasApiService::class.java),
+            retromock.create(FacturasApiService::class.java),
+            mockProvider
+        )
+    }
+
+    @Provides
+    fun provideFacturasApiService(
+        factory: FacturasApiServiceFactory
     ): FacturasApiService {
-        return if (mockProvider.isMockEnabled()) {
-            retromock.create(FacturasApiService::class.java)
-        } else {
-            retrofit.create(FacturasApiService::class.java)
-        }
+        return factory.getApiService()
     }
 
 }

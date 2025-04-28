@@ -13,6 +13,12 @@ val Application.dataStore by preferencesDataStore(name = "settings")
 @HiltAndroidApp
 class PracticaAndroidApplication : Application(), UseMockProvider {
 
+    // Clave para el valor en DataStore
+    private val useMockKey = booleanPreferencesKey("use_mock")
+
+    // Variable para almacenar el estado actual
+    private var currentMockState: Boolean = false
+
     override fun isMockEnabled(): Boolean {
 
         // En producción, siempre Retrofit (false)
@@ -20,14 +26,19 @@ class PracticaAndroidApplication : Application(), UseMockProvider {
             return false
         }
 
-        // En DEBUG, comprobar si el sistema de mocks está activado
-        val key = booleanPreferencesKey("use_mock")
-        return runBlocking {
-            dataStore.data.first()[key] == true
-        }
+        return currentMockState
     }
 
     override fun onCreate() {
         super.onCreate()
+
+        runBlocking {
+            currentMockState = dataStore.data.first()[useMockKey] ?: false
+        }
+    }
+
+    // Método para actualizar el estado del sistema de mocks
+    fun updateMockState(isEnabled: Boolean) {
+        currentMockState = isEnabled
     }
 }

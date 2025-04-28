@@ -109,6 +109,7 @@ fun MainScreen(navController: NavController) {
                                 preferences[booleanPreferencesKey("use_mock")] = isChecked
                             }
                         }
+                        context.updateMockState(isChecked)
                         Toast.makeText(
                             context,
                             if (isChecked) R.string.mocks_activado else R.string.mocks_desactivado,

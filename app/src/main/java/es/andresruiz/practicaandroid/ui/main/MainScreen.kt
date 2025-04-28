@@ -56,7 +56,7 @@ fun MainScreen(navController: NavController) {
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.iber_logo),
-                            contentDescription = "Logo de la aplicación",
+                            contentDescription = stringResource(R.string.desc_logo),
                             modifier = Modifier
                                 .height(56.dp)
                                 .padding(vertical = 8.dp)
@@ -81,7 +81,7 @@ fun MainScreen(navController: NavController) {
         ) {
             // Título de bienvenida
             Text(
-                text = "Bienvenido a tu app",
+                text = stringResource(R.string.bienvenido),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -111,7 +111,7 @@ fun MainScreen(navController: NavController) {
                         }
                         Toast.makeText(
                             context,
-                            if (isChecked) "Sistema de mocks activado" else "Sistema de mocks desactivado",
+                            if (isChecked) R.string.mocks_activado else R.string.mocks_desactivado,
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -150,7 +150,7 @@ fun HomeButtons(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_facturas),
-                    contentDescription = "Icono de facturas",
+                    contentDescription = stringResource(R.string.desc_ic_facturas),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(28.dp)
                 )
@@ -161,7 +161,7 @@ fun HomeButtons(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Gestiona tus facturas",
+                        text = stringResource(R.string.subtitulo_facturas),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -188,7 +188,7 @@ fun HomeButtons(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_smart_solar),
-                    contentDescription = "Icono de Smart Solar",
+                    contentDescription = stringResource(R.string.desc_ic_smartsolar),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(28.dp)
                 )
@@ -199,7 +199,7 @@ fun HomeButtons(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Monitoriza tu energía solar",
+                        text = stringResource(R.string.subtitulo_smartsolar),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -230,11 +230,11 @@ fun DevSettingsCard(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_dev),
-                    contentDescription = "Configuración de desarrollo",
+                    contentDescription = stringResource(R.string.config_desarrollo),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Configuración de desarrollo",
+                    text = stringResource(R.string.config_desarrollo),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -252,12 +252,12 @@ fun DevSettingsCard(
             ) {
                 Column {
                     Text(
-                        text = "Usar sistema de Mocks",
+                        text = stringResource(R.string.usar_mocks),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "Activar para usar datos de prueba",
+                        text = stringResource(R.string.subtitulo_mocks),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.secondary
                     )

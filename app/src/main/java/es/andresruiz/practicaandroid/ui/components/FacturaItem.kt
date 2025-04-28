@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import es.andresruiz.core.utils.formatDateToDisplay
@@ -50,7 +51,7 @@ fun FacturaItem(factura: Factura, modifier: Modifier = Modifier, onClick: () -> 
                 )
 
                 // El estado sólo aparece si la factura está pendiente de pago
-                if (factura.descEstado == "Pendiente de pago") {
+                if (factura.descEstado == stringResource(R.string.pendiente)) {
                     Text(
                         text = factura.descEstado,
                         style = MaterialTheme.typography.bodyMedium,
@@ -72,7 +73,7 @@ fun FacturaItem(factura: Factura, modifier: Modifier = Modifier, onClick: () -> 
 
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_forward),
-                    contentDescription = "Botón para abrir detalles de la factura",
+                    contentDescription = stringResource(R.string.desc_boton_factura),
                     tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier
                         .padding(start = 8.dp)

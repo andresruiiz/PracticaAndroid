@@ -3,8 +3,9 @@ package es.andresruiz.practicaandroid.ui.facturas
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import es.andresruiz.data_retrofit.repository.FacturasRepository
 import es.andresruiz.domain.models.Factura
+import es.andresruiz.domain.usecases.GetFacturasUseCase
+import es.andresruiz.domain.usecases.RefreshFacturasUseCase
 import es.andresruiz.practicaandroid.ui.filtros.FilterManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +22,8 @@ import kotlin.math.floor
  */
 @HiltViewModel
 class FacturasViewModel @Inject constructor(
-    private val repository: FacturasRepository,
+    private val getFacturasUseCase: GetFacturasUseCase,
+    private val refreshFacturasUseCase: RefreshFacturasUseCase,
     private val filterManager: FilterManager
 ) : ViewModel() {
 
@@ -64,7 +66,7 @@ class FacturasViewModel @Inject constructor(
     private fun loadFacturasFromDatabase() {
         viewModelScope.launch {
             try {
-                repository.getFacturas().collect { facturas ->
+                getFacturasUseCase().collect { facturas ->
                     if (facturas.isEmpty() && !_isLoading.value) {
                         // Cargo las facturas desde la API si la base de datos está vacía
                         refreshFacturas()
@@ -115,7 +117,7 @@ class FacturasViewModel @Inject constructor(
             _error.value = null
 
             try {
-                repository.refreshFacturas()
+                refreshFacturasUseCase()
             } catch (e: Exception) {
                 _error.value = e.message ?: "Error desconocido al refrescar facturas"
             } finally {

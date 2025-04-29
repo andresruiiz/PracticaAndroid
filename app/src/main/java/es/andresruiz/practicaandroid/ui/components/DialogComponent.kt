@@ -10,11 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import es.andresruiz.practicaandroid.R
+import es.andresruiz.practicaandroid.ui.theme.AppShapes
+import es.andresruiz.practicaandroid.ui.theme.AppTheme
 
 /**
  * Componente de diálogo informativo reutilizable
@@ -43,7 +43,7 @@ fun InfoDialog(
                 textAlign = TextAlign.Center
             )
         },
-        shape = RectangleShape,
+        shape = AppShapes.DialogShape,
         confirmButton = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -53,7 +53,7 @@ fun InfoDialog(
                     onClick = onDismiss,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 30.dp)
+                        .padding(horizontal = AppTheme.Spacing.extraLarge)
                 ) {
                     Text(buttonText)
                 }

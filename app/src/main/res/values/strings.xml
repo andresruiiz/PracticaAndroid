@@ -61,4 +61,5 @@
     <string name="titulo_dialog_detalles">Estado solicitud autoconsumo</string>
     <string name="mensaje_dialog_detalles">El tiempo estimado de activación de tu autoconsumo es de 1 a 2 meses, éste variará en función de tu comunidad autónoma y distribuidora</string>
     <string name="aceptar">Aceptar</string>
+    <string name="ok">OK</string>
 </resources>

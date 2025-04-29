@@ -20,12 +20,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import es.andresruiz.practicaandroid.R
+import es.andresruiz.practicaandroid.ui.theme.AppTheme
+import es.andresruiz.practicaandroid.ui.theme.StatusInfo
+import es.andresruiz.practicaandroid.ui.theme.TextSecondary
 
 /**
  * Componente para mostrar campos de texto de solo lectura
@@ -46,10 +48,10 @@ fun ReadOnlyTextField(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = Color.Transparent,
+                color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.small
             )
-            .padding(bottom = 32.dp),
+            .padding(bottom = AppTheme.Spacing.large),
         textStyle = LocalTextStyle.current.copy(
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Start
@@ -59,12 +61,12 @@ fun ReadOnlyTextField(
                 Text(
                     text = label,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    color = TextSecondary
                 )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 4.dp)
+                        .padding(top = AppTheme.Spacing.extraSmall)
                 ) {
                     innerTextField()
                     if (infoIcon) {
@@ -79,7 +81,7 @@ fun ReadOnlyTextField(
                                 Icon(
                                     painter = painterResource(R.drawable.ic_info),
                                     contentDescription = stringResource(R.string.desc_boton_info),
-                                    tint = Color(0xFF549BFF)
+                                    tint = StatusInfo
                                 )
                             }
                         }
@@ -87,13 +89,16 @@ fun ReadOnlyTextField(
                 }
                 Divider(
                     modifier = Modifier.fillMaxWidth(),
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }
     )
 }
 
+/**
+ * Componente para mostrar un elemento de checkbox
+ */
 @Composable
 fun CheckboxItem(
     text: String,
@@ -110,8 +115,8 @@ fun CheckboxItem(
             checked = isChecked,
             onCheckedChange = onCheckedChange,
             colors = CheckboxDefaults.colors(
-                checkedColor = Color(0xFF8BC34A),
-                uncheckedColor = Color(0xFFE0E0E0)
+                checkedColor = MaterialTheme.colorScheme.primary,
+                uncheckedColor = MaterialTheme.colorScheme.outline
             )
         )
         Text(

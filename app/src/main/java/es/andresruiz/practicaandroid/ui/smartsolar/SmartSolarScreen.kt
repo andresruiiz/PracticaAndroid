@@ -40,8 +40,11 @@ import es.andresruiz.practicaandroid.ui.components.InfoDialog
 import es.andresruiz.practicaandroid.ui.components.LoadingView
 import es.andresruiz.practicaandroid.ui.components.ReadOnlyTextField
 import es.andresruiz.practicaandroid.ui.components.TopBar
+import es.andresruiz.practicaandroid.ui.theme.AppTheme
 
-
+/**
+ * Pantalla de Smart Solar
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SmartSolarScreen(navController: NavController) {
@@ -109,19 +112,22 @@ fun SmartSolarScreen(navController: NavController) {
     }
 }
 
+/**
+ * Sección de Mi Instalación dentro de Smart Solar
+ */
 @Composable
 fun MiInstalacionScreen() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(AppTheme.Spacing.medium)
     ) {
         Text(
             text = stringResource(R.string.texto_instalacion),
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier.padding(bottom = AppTheme.Spacing.large)
         )
 
-        Row(modifier = Modifier.padding(bottom = 8.dp)) {
+        Row(modifier = Modifier.padding(bottom = AppTheme.Spacing.small)) {
             Text(
                 text = stringResource(R.string.autoconsumo),
                 color = MaterialTheme.colorScheme.secondary
@@ -140,12 +146,15 @@ fun MiInstalacionScreen() {
     }
 }
 
+/**
+ * Sección de Energía dentro de Smart Solar
+ */
 @Composable
 fun EnergiaScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(80.dp),
+            .padding(AppTheme.Spacing.extraHuge),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -154,7 +163,7 @@ fun EnergiaScreen() {
             contentDescription = stringResource(R.string.desc_graf_mantenimiento),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 32.dp),
+                .padding(bottom = AppTheme.Spacing.extraLarge),
             contentScale = ContentScale.Crop
         )
 
@@ -165,6 +174,9 @@ fun EnergiaScreen() {
     }
 }
 
+/**
+ * Sección de Detalles dentro de Smart Solar
+ */
 @Composable
 fun DetallesScreen(viewModel: DetallesViewModel = hiltViewModel()) {
 
@@ -174,7 +186,7 @@ fun DetallesScreen(viewModel: DetallesViewModel = hiltViewModel()) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(AppTheme.Spacing.medium)
     ) {
         when (val state = uiState) {
             is DetallesUiState.Loading -> {

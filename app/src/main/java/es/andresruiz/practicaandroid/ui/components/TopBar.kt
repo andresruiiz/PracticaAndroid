@@ -24,7 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import es.andresruiz.practicaandroid.R
+import es.andresruiz.practicaandroid.ui.theme.AppTheme
 
+/**
+ * Barra superior usada en las pantallas de la aplicación
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
@@ -62,7 +66,7 @@ fun TopBar(
                             painter = icon,
                             contentDescription = stringResource(R.string.desc_boton_volver),
                             modifier = Modifier
-                                .padding(end = 8.dp)
+                                .padding(end = AppTheme.Spacing.small)
                                 .size(16.dp)
                         )
                         Text(

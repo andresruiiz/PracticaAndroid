@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,7 +22,12 @@ import androidx.compose.ui.unit.dp
 import es.andresruiz.core.utils.formatDateToDisplay
 import es.andresruiz.domain.models.Factura
 import es.andresruiz.practicaandroid.R
+import es.andresruiz.practicaandroid.ui.theme.AppTheme
+import es.andresruiz.practicaandroid.ui.theme.DividerColor
 
+/**
+ * Elemento reutilizable para cada factura individual
+ */
 @Composable
 fun FacturaItem(factura: Factura, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Column(
@@ -76,14 +80,14 @@ fun FacturaItem(factura: Factura, modifier: Modifier = Modifier, onClick: () -> 
                     contentDescription = stringResource(R.string.desc_boton_factura),
                     tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier
-                        .padding(start = 8.dp)
+                        .padding(start = AppTheme.Spacing.small)
                         .size(20.dp)
                 )
             }
         }
 
         Divider(
-            color = Color.LightGray,
+            color = DividerColor,
             thickness = 1.dp,
             modifier = Modifier.padding(start = 12.dp)
         )

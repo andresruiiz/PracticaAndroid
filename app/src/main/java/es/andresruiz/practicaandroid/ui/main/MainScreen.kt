@@ -3,7 +3,6 @@ package es.andresruiz.practicaandroid.ui.main
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,10 +22,15 @@ import es.andresruiz.practicaandroid.R
 import es.andresruiz.practicaandroid.dataStore
 import es.andresruiz.practicaandroid.navigation.Facturas
 import es.andresruiz.practicaandroid.navigation.SmartSolar
+import es.andresruiz.practicaandroid.ui.theme.AppShapes
+import es.andresruiz.practicaandroid.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**
+ * Pantalla principal de la aplicación
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavController) {
@@ -121,6 +125,9 @@ fun MainScreen(navController: NavController) {
     }
 }
 
+/**
+ * Sección con los botones de la pantalla de inicio
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeButtons(
@@ -129,13 +136,13 @@ fun HomeButtons(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(AppTheme.Spacing.medium)
     ) {
         // Facturas Card
         ElevatedCard(
             onClick = { navController.navigate(Facturas) },
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+            shape = AppShapes.CardShape,
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = AppTheme.Elevation.small),
             colors = CardDefaults.elevatedCardColors(
                 containerColor = MaterialTheme.colorScheme.surface,
             ),
@@ -144,8 +151,8 @@ fun HomeButtons(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    .padding(AppTheme.Spacing.large),
+                horizontalArrangement = Arrangement.spacedBy(AppTheme.Spacing.medium),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -172,8 +179,8 @@ fun HomeButtons(
         // Smart Solar Card
         ElevatedCard(
             onClick = { navController.navigate(SmartSolar) },
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+            shape = AppShapes.CardShape,
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = AppTheme.Elevation.small),
             colors = CardDefaults.elevatedCardColors(
                 containerColor = MaterialTheme.colorScheme.surface,
             ),
@@ -182,8 +189,8 @@ fun HomeButtons(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    .padding(AppTheme.Spacing.large),
+                horizontalArrangement = Arrangement.spacedBy(AppTheme.Spacing.medium),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -209,24 +216,27 @@ fun HomeButtons(
     }
 }
 
+/**
+ * Sección con las ajustes de desarrollador (activar mocks)
+ */
 @Composable
 fun DevSettingsCard(
     useMock: Boolean,
     onToggleMock: (Boolean) -> Unit
 ) {
     OutlinedCard(
-        shape = RoundedCornerShape(16.dp),
+        shape = AppShapes.CardShape,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 24.dp)
+            .padding(bottom = AppTheme.Spacing.large)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(AppTheme.Spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(AppTheme.Spacing.small)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(AppTheme.Spacing.small)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_dev),
@@ -241,7 +251,7 @@ fun DevSettingsCard(
             }
 
             Divider(
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(vertical = AppTheme.Spacing.small),
                 color = MaterialTheme.colorScheme.secondary
             )
 

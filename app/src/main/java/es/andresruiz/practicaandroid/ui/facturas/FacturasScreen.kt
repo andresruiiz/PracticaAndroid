@@ -25,10 +25,12 @@ import es.andresruiz.practicaandroid.ui.components.EmptyStateView
 import es.andresruiz.practicaandroid.ui.components.ErrorView
 import es.andresruiz.practicaandroid.ui.components.FacturaItem
 import es.andresruiz.practicaandroid.ui.components.InfoDialog
-import es.andresruiz.practicaandroid.ui.components.LoadingView
 import es.andresruiz.practicaandroid.ui.components.TopBar
 import es.andresruiz.practicaandroid.ui.facturas.FacturasViewModel.FacturasUiState
 
+/**
+ * Pantalla en la que se muestran las facturas
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FacturasScreen(

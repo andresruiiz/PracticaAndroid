@@ -3,8 +3,8 @@ package es.andresruiz.practicaandroid.ui.smartsolar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import es.andresruiz.data_retrofit.repository.DetallesRepository
 import es.andresruiz.domain.models.Detalles
+import es.andresruiz.domain.usecases.GetDetallesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class DetallesViewModel @Inject constructor(
-    private val detallesRepository: DetallesRepository
+    private val getDetallesUseCase: GetDetallesUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DetallesUiState>(DetallesUiState.Loading)
@@ -31,7 +31,7 @@ class DetallesViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = DetallesUiState.Loading
             try {
-                val detalles = detallesRepository.getDetalles()
+                val detalles = getDetallesUseCase()
 
                 if (detalles.cau.isBlank() && detalles.estadoSolicitud.isBlank()) {
                     _uiState.value = DetallesUiState.Empty("No hay detalles disponibles para mostrar")

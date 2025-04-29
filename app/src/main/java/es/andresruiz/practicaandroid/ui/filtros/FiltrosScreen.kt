@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -44,7 +43,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,7 +55,12 @@ import es.andresruiz.core.utils.convertMillisToDate
 import es.andresruiz.practicaandroid.R
 import es.andresruiz.practicaandroid.ui.components.CheckboxItem
 import es.andresruiz.practicaandroid.ui.components.TopBar
+import es.andresruiz.practicaandroid.ui.theme.AppShapes
+import es.andresruiz.practicaandroid.ui.theme.AppTheme
 
+/**
+ * Pantalla para mostrar los filtros
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -161,6 +164,9 @@ fun FiltrosScreen(
     }
 }
 
+/**
+ * Sección con los selectores de fechas
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DateFilterSection(
@@ -175,7 +181,7 @@ fun DateFilterSection(
         text = stringResource(R.string.con_fecha_emision),
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+        modifier = Modifier.padding(top = AppTheme.Spacing.medium, bottom = AppTheme.Spacing.small)
     )
 
     Row(
@@ -189,7 +195,7 @@ fun DateFilterSection(
                 text = stringResource(R.string.desde),
                 color = MaterialTheme.colorScheme.secondary,
                 fontSize = 14.sp,
-                modifier = Modifier.padding(bottom = 4.dp)
+                modifier = Modifier.padding(bottom = AppTheme.Spacing.extraSmall)
             )
             SimpleDateField(
                 value = fechaDesde,
@@ -198,7 +204,7 @@ fun DateFilterSection(
             )
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(AppTheme.Spacing.medium))
 
         // Hasta
         Column(
@@ -208,7 +214,7 @@ fun DateFilterSection(
                 text = stringResource(R.string.hasta),
                 color = MaterialTheme.colorScheme.secondary,
                 fontSize = 14.sp,
-                modifier = Modifier.padding(bottom = 4.dp)
+                modifier = Modifier.padding(bottom = AppTheme.Spacing.extraSmall)
             )
             SimpleDateField(
                 value = fechaHasta,
@@ -243,6 +249,9 @@ fun DateFilterSection(
     }
 }
 
+/**
+ * Componente para los campos de fecha
+ */
 @Composable
 fun SimpleDateField(
     value: String,
@@ -254,10 +263,10 @@ fun SimpleDateField(
             .height(38.dp)
             .background(
                 color = MaterialTheme.colorScheme.secondary,
-                shape = RoundedCornerShape(12.dp)
+                shape = AppShapes.DateFieldShape
             )
             .clickable { onClick() }
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = AppTheme.Spacing.medium),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -267,6 +276,9 @@ fun SimpleDateField(
     }
 }
 
+/**
+ * Componente para el selector de fecha
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
@@ -277,13 +289,13 @@ fun DatePickerModal(
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
-        shape = RectangleShape,
+        shape = AppShapes.DialogShape,
         confirmButton = {
             Button(onClick = {
                 onDateSelected(datePickerState.selectedDateMillis)
                 onDismiss()
             }) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
@@ -301,6 +313,9 @@ fun DatePickerModal(
     }
 }
 
+/**
+ * Sección con el selector de importe
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AmountFilterSection(
@@ -325,7 +340,7 @@ fun AmountFilterSection(
         text = stringResource(R.string.por_importe),
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        modifier = Modifier.padding(bottom = 16.dp)
+        modifier = Modifier.padding(bottom = AppTheme.Spacing.medium)
     )
 
     Row(
@@ -342,7 +357,7 @@ fun AmountFilterSection(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 3.dp)
+            .padding(vertical = AppTheme.Spacing.extraSmall)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -361,7 +376,7 @@ fun AmountFilterSection(
                 activeTrackColor = MaterialTheme.colorScheme.primary,
                 inactiveTrackColor = MaterialTheme.colorScheme.secondary
             ),
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = AppTheme.Spacing.medium),
             startThumb = {
                 Thumb(
                     modifier = Modifier
@@ -392,6 +407,9 @@ fun AmountFilterSection(
     }
 }
 
+/**
+ * Sección con los checkboxes de estado
+ */
 @Composable
 fun StatusFilterSection(
     isPagadasChecked: Boolean,
@@ -409,7 +427,7 @@ fun StatusFilterSection(
         text = stringResource(R.string.por_estado),
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        modifier = Modifier.padding(bottom = 6.dp)
+        modifier = Modifier.padding(bottom = AppTheme.Spacing.small)
     )
 
     CheckboxItem(
@@ -443,6 +461,9 @@ fun StatusFilterSection(
     )
 }
 
+/**
+ * Sección con los botones de aplicar y eliminar
+ */
 @Composable
 fun ButtonsSection(
     onClearFilters: () -> Unit,
@@ -451,7 +472,7 @@ fun ButtonsSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(vertical = AppTheme.Spacing.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -459,7 +480,7 @@ fun ButtonsSection(
             onClick = onApplyFilters,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp)
+                .padding(horizontal = AppTheme.Spacing.extraLarge)
         ) {
             Text(stringResource(R.string.aplicar))
         }

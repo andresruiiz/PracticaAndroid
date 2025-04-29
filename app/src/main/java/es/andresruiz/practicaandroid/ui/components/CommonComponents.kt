@@ -16,8 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import es.andresruiz.practicaandroid.R
+import es.andresruiz.practicaandroid.ui.theme.AppTheme
 
 /**
  * Componente reutilizable para mostrar estados de error
@@ -31,7 +31,7 @@ fun ErrorView(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(AppTheme.Spacing.medium),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -41,7 +41,7 @@ fun ErrorView(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(AppTheme.Spacing.small))
 
         Text(
             text = message,
@@ -49,7 +49,7 @@ fun ErrorView(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppTheme.Spacing.medium))
 
         Button(onClick = onRetry) {
             Text(stringResource(R.string.reintentar))

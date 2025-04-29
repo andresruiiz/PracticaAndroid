@@ -1,6 +1,6 @@
 package es.andresruiz.data_retrofit.repository
 
-import es.andresruiz.data_retrofit.network.FacturasApiService
+import es.andresruiz.data_retrofit.network.FacturasApiServiceFactory
 import es.andresruiz.domain.models.Detalles
 
 /**
@@ -14,10 +14,12 @@ interface DetallesRepository {
  * Implementación Network del Repositorio que obtiene las facturas de la API de facturas
  */
 class NetworkDetallesRepository(
-    private val facturasApiService: FacturasApiService,
+    private val facturasApiServiceFactory: FacturasApiServiceFactory,
 ) : DetallesRepository {
 
     override suspend fun getDetalles(): Detalles {
+        // Obtengo la implementación actual del API service
+        val facturasApiService = facturasApiServiceFactory.getApiService()
         return facturasApiService.getDetallesSmartSolar()
     }
 }

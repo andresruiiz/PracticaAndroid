@@ -103,6 +103,6 @@ class FiltrosViewModel @Inject constructor(
         }
 
         // Guardar el estado en el FilterManager
-        filterManager.saveFilter(filterState)
+        filterManager.saveFilter(finalFilterState)
     }
 }

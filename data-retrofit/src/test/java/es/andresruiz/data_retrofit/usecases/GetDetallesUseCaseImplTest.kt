@@ -24,11 +24,11 @@ class GetDetallesUseCaseImplTest {
     fun getDetallesUseCase_invoke_returnsDetallesFromRepository() = runTest {
         // Arrange
         val expectedDetalles = Detalles(
-            cau = "CAU123456",
-            estadoSolicitud = "Activa",
-            tipoAutoconsumo = "Individual",
-            compensacionExcendentes = "Con compensación",
-            potenciaInstalacion = "5kW"
+            cau = "ES002100000000199LJ1FA000",
+            estadoSolicitud = "No hemos recibido ninguna solicitud de autoconsumo",
+            tipoAutoconsumo = "Con excedentes y compensación individual - Consumo",
+            compensacionExcendentes = "Precio PVPC",
+            potenciaInstalacion = "5kWp"
         )
         whenever(detallesRepository.getDetalles()).thenReturn(expectedDetalles)
 
@@ -37,11 +37,11 @@ class GetDetallesUseCaseImplTest {
 
         // Assert
         assertEquals(expectedDetalles, result)
-        assertEquals("CAU123456", result.cau)
-        assertEquals("Activa", result.estadoSolicitud)
-        assertEquals("Individual", result.tipoAutoconsumo)
-        assertEquals("Con compensación", result.compensacionExcendentes)
-        assertEquals("5kW", result.potenciaInstalacion)
+        assertEquals("ES002100000000199LJ1FA000", result.cau)
+        assertEquals("No hemos recibido ninguna solicitud de autoconsumo", result.estadoSolicitud)
+        assertEquals("Con excedentes y compensación individual - Consumo", result.tipoAutoconsumo)
+        assertEquals("Precio PVPC", result.compensacionExcendentes)
+        assertEquals("5kWp", result.potenciaInstalacion)
     }
 
     @Test

@@ -442,4 +442,24 @@ class FacturasViewModelTest {
         // Assert
         assertNull(viewModel.error.value)
     }
+
+    @Test
+    fun facturasViewModel_uiStateEmpty_whenFiltersRemoveAllFacturas() = runTest {
+        // Arrange
+        val facturasFlow = MutableStateFlow(testFacturas)
+        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
+        val filterStateFlow = MutableStateFlow(FilterState())
+        whenever(filterManager.filterState).thenReturn(filterStateFlow)
+        whenever(filterManager.getCurrentFilter()).thenReturn(FilterState(importeMin = 1000))
+
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Act
+        filterStateFlow.value = FilterState(importeMin = 1000)
+
+        // Assert
+        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Empty)
+        val state = viewModel.uiState.value as FacturasViewModel.FacturasUiState.Empty
+        assertEquals("No hay facturas que coincidan con los filtros seleccionados", state.message)
+    }
 }

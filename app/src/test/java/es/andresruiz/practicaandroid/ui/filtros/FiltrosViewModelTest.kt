@@ -236,4 +236,30 @@ class FiltrosViewModelTest {
         // Assert - Verificamos que se guardó un FilterState con los valores correctos
         verify(filterManager).saveFilter(expectedFilterState)
     }
+
+    @Test
+    fun aplicarFiltros_WhenMinGreaterThanMax_AdjustsMaxToMin() = runTest {
+        // Arrange
+        viewModel = FiltrosViewModel(filterManager)
+        viewModel.setImporteMin(150)
+        viewModel.setImporteMax(150)
+
+        val importeMinField = FiltrosViewModel::class.java.getDeclaredField("_importeMin")
+        importeMinField.isAccessible = true
+        (importeMinField.get(viewModel) as MutableStateFlow<Int>).value = 200
+
+        val expectedFilterState = FilterState(
+            fechaDesde = "",
+            fechaHasta = "",
+            importeMin = 200,
+            importeMax = 200,
+            estados = initialFilterState.estados
+        )
+
+        // Act
+        viewModel.aplicarFiltros()
+
+        // Assert
+        verify(filterManager).saveFilter(expectedFilterState)
+    }
 }

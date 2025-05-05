@@ -550,4 +550,88 @@ class FacturasViewModelTest {
         // Assert
         assertFalse(viewModel.showDialog.value)
     }
+
+    @Test
+    fun facturasViewModel_updateFilterManagerBounds_whenAllImportesAreEqual() = runTest {
+        // Arrange
+        val facturasIguales = listOf(
+            Factura("Pagada", 100.0, "01/01/2025"),
+            Factura("Anulada", 100.0, "15/02/2025")
+        )
+        val facturasFlow = MutableStateFlow(facturasIguales)
+        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
+
+        // Act
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Assert
+        verify(filterManager).updateDataBounds(100, 100)
+    }
+
+    @Test
+    fun facturasViewModel_refreshFacturas_handlesUnknownException() = runTest {
+        // Arrange
+        whenever(refreshFacturasUseCase()).thenAnswer { throw Exception() }
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Act
+        viewModel.refreshFacturas()
+
+        // Assert
+        assertEquals("Error desconocido al refrescar facturas", viewModel.error.value)
+    }
+
+    @Test
+    fun facturasViewModel_databaseEmitsNewFacturas_updatesUiState() = runTest {
+        // Arrange
+        val facturasFlow = MutableStateFlow(emptyList<Factura>())
+        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Empty)
+
+        // Act - database emits new facturas
+        facturasFlow.value = testFacturas
+
+        // Assert
+        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Success)
+        assertEquals(testFacturas, (viewModel.uiState.value as FacturasViewModel.FacturasUiState.Success).facturas)
+    }
+
+    @Test
+    fun facturasViewModel_partialFiltering_correctlyFiltersFacturas() = runTest {
+        // Arrange
+        val facturasFlow = MutableStateFlow(testFacturas)
+        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
+
+        val filterStateFlow = MutableStateFlow(FilterState())
+        whenever(filterManager.filterState).thenReturn(filterStateFlow)
+
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Act - filtrar solo por importe mínimo, no por estado
+        filterStateFlow.value = FilterState(importeMin = 150)
+
+        // Assert - debería mostrar solo facturas con importe >= 150
+        assertEquals(2, viewModel.facturas.value.size)
+        assertTrue(viewModel.facturas.value.all { it.importeOrdenacion >= 150 })
+    }
+
+    @Test
+    fun facturasViewModel_refreshWithNetworkError_showsSpecificError() = runTest {
+        // Arrange
+        whenever(getFacturasUseCase()).thenReturn(MutableStateFlow(testFacturas))
+        val networkError = IOException("Error de conexión")
+        whenever(refreshFacturasUseCase()).thenAnswer { throw networkError }
+
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Act
+        viewModel.refreshFacturas()
+
+        // Assert - verificar que el mensaje de error es específico para errores de red
+        assertEquals(networkError.message, viewModel.error.value)
+        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Error)
+        assertEquals(networkError.message, (viewModel.uiState.value as FacturasViewModel.FacturasUiState.Error).message)
+    }
 }

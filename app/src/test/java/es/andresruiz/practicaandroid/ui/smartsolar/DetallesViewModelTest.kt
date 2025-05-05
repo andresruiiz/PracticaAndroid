@@ -4,6 +4,7 @@ import es.andresruiz.domain.models.Detalles
 import es.andresruiz.domain.usecases.GetDetallesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -119,5 +120,56 @@ class DetallesViewModelTest {
         val currentState = viewModel.uiState.value
         assertTrue(currentState is DetallesUiState.Success)
         assertEquals(mockDetalles, (currentState as DetallesUiState.Success).detalles)
+    }
+
+    @Test
+    fun fetchDetalles_LoadingState_IsSetInitially() = runTest {
+        // Arrange
+        val testDispatcher = StandardTestDispatcher(testScheduler)
+        Dispatchers.setMain(testDispatcher)
+        whenever(getDetallesUseCase()).thenReturn(mockDetalles)
+
+        // Act
+        viewModel = DetallesViewModel(getDetallesUseCase)
+
+        // Assert
+        assertTrue(viewModel.uiState.value is DetallesUiState.Loading)
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(viewModel.uiState.value is DetallesUiState.Success)
+    }
+
+    @Test
+    fun fetchDetalles_ExceptionWithoutMessage_ReturnsErrorState() = runTest {
+        // Arrange
+        whenever(getDetallesUseCase()).thenThrow(RuntimeException())
+
+        // Act
+        viewModel = DetallesViewModel(getDetallesUseCase)
+
+        // Assert
+        val currentState = viewModel.uiState.value
+        assertTrue(currentState is DetallesUiState.Error)
+        assertEquals("Error al cargar los detalles", (currentState as DetallesUiState.Error).message)
+    }
+
+    @Test
+    fun fetchDetalles_CauBlankEstadoNoBlank_ReturnsSuccessState() = runTest {
+        // Arrange
+        val detallesParciales = Detalles(
+            cau = "",
+            estadoSolicitud = "Activo",
+            tipoAutoconsumo = "Tipo",
+            compensacionExcendentes = "Compensación",
+            potenciaInstalacion = "Potencia"
+        )
+        whenever(getDetallesUseCase()).thenReturn(detallesParciales)
+
+        // Act
+        viewModel = DetallesViewModel(getDetallesUseCase)
+
+        // Assert
+        val currentState = viewModel.uiState.value
+        assertTrue(currentState is DetallesUiState.Success)
+        assertEquals(detallesParciales, (currentState as DetallesUiState.Success).detalles)
     }
 }

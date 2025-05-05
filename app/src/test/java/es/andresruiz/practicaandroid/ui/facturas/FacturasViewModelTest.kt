@@ -462,4 +462,92 @@ class FacturasViewModelTest {
         val state = viewModel.uiState.value as FacturasViewModel.FacturasUiState.Empty
         assertEquals("No hay facturas que coincidan con los filtros seleccionados", state.message)
     }
+
+    @Test
+    fun facturasViewModel_loadFacturas_handlesUnknownError() = runTest {
+        // Arrange
+        whenever(getFacturasUseCase()).thenAnswer { throw Exception() } // Error sin mensaje
+
+        // Act
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Assert
+        assertEquals("Error desconocido al cargar facturas", viewModel.error.value)
+        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Error)
+    }
+
+    @Test
+    fun facturasViewModel_uiStateEmpty_whenNoFacturasAtAll() = runTest {
+        // Arrange
+        whenever(getFacturasUseCase()).thenReturn(MutableStateFlow(emptyList()))
+
+        // Act
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Assert
+        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Empty)
+        val state = viewModel.uiState.value as FacturasViewModel.FacturasUiState.Empty
+        assertEquals("No hay facturas disponibles", state.message)
+    }
+
+    @Test
+    fun facturasViewModel_filterChange_doesNotChangeFacturas() = runTest {
+        // Arrange
+        val facturasFlow = MutableStateFlow(testFacturas)
+        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
+
+        val filterStateFlow = MutableStateFlow(FilterState()) // Filtro sin cambios
+        whenever(filterManager.filterState).thenReturn(filterStateFlow)
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Act
+        filterStateFlow.value = FilterState() // Aplicar el mismo filtro
+
+        // Assert
+        assertEquals(testFacturas, viewModel.facturas.value) // Lista sin cambios
+        assertFalse(viewModel.isEmpty.value)
+    }
+
+    @Test
+    fun facturasViewModel_loadFacturas_unexpectedException() = runTest {
+        // Arrange
+        val unexpectedError = IllegalStateException("Estado inesperado")
+        whenever(getFacturasUseCase()).thenAnswer { throw unexpectedError }
+
+        // Act
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Assert
+        assertEquals(unexpectedError.message, viewModel.error.value)
+        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Error)
+    }
+
+    @Test
+    fun facturasViewModel_uiStateSuccess_withEmptyFacturas() = runTest {
+        // Arrange
+        val emptyFacturas = emptyList<Factura>()
+        val facturasFlow = MutableStateFlow(emptyFacturas)
+        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
+
+        // Act
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Assert
+        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Empty)
+    }
+
+    @Test
+    fun facturasViewModel_showDialogThenHideDialog_correctValue() = runTest {
+        // Arrange
+        whenever(getFacturasUseCase()).thenReturn(MutableStateFlow(testFacturas))
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Act
+        viewModel.showDialog()
+        assertTrue(viewModel.showDialog.value)
+        viewModel.hideDialog()
+
+        // Assert
+        assertFalse(viewModel.showDialog.value)
+    }
 }

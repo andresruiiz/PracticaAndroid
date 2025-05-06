@@ -316,8 +316,16 @@ fun DatePickerModal(
     maxDate: Long? = null,
     minDate: Long? = null
 ) {
+    // Asegurar que la fecha inicial esté dentro de los límites permitidos
+    val validInitialDate = when {
+        initialSelectedDateMillis == null -> maxDate ?: getCurrentDateInMillis()
+        maxDate != null && initialSelectedDateMillis > maxDate -> maxDate
+        minDate != null && initialSelectedDateMillis < minDate -> minDate
+        else -> initialSelectedDateMillis
+    }
+
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialSelectedDateMillis ?: maxDate,
+        initialSelectedDateMillis = validInitialDate,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 // Restringir la selección entre las fechas mínima y máxima
@@ -334,8 +342,21 @@ fun DatePickerModal(
         shape = AppShapes.DialogShape,
         confirmButton = {
             Button(onClick = {
-                onDateSelected(datePickerState.selectedDateMillis)
-                onDismiss()
+                // Validar la fecha seleccionada antes de confirmar
+                val selectedMillis = datePickerState.selectedDateMillis
+                if (selectedMillis != null) {
+                    val isValid = (minDate == null || selectedMillis >= minDate) &&
+                            (maxDate == null || selectedMillis <= maxDate)
+
+                    if (isValid) {
+                        onDateSelected(selectedMillis)
+                        onDismiss()
+                    }
+                    // Si la fecha no es válida, no hacemos nada y mantenemos el diálogo abierto
+                } else {
+                    // Si no hay fecha seleccionada, cerramos el diálogo sin seleccionar
+                    onDismiss()
+                }
             }) {
                 Text(stringResource(R.string.ok))
             }

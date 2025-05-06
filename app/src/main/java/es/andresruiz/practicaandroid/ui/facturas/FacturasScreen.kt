@@ -12,6 +12,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
@@ -40,6 +41,7 @@ fun FacturasScreen(
 
     val uiState = viewModel.uiState.collectAsState().value
     val showDialog = viewModel.showDialog.collectAsState().value
+    val isRefreshing = viewModel.isRefreshing.collectAsState().value
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
@@ -62,7 +64,7 @@ fun FacturasScreen(
                 .padding(innerPadding)
         ) {
             PullToRefreshBox(
-                isRefreshing = uiState is FacturasUiState.Loading,
+                isRefreshing = isRefreshing,
                 onRefresh = { viewModel.refreshFacturas() },
                 modifier = Modifier.fillMaxSize()
             ) {

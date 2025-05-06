@@ -138,8 +138,10 @@ class DateUtilsTest {
     fun formatDateToDisplay_moreCharacters_returnsCorrectDate() {
         // Arrange
         val input = "12/04/2025abc"
+
         // Act
         val result = formatDateToDisplay(input)
+
         // Assert
         assertEquals("12 Abr 2025", result)
     }

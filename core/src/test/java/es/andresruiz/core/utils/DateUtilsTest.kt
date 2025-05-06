@@ -133,4 +133,15 @@ class DateUtilsTest {
         // Assert
         assertEquals("31/12/1969", result)
     }
+
+    @Test
+    fun formatDateToDisplay_moreCharacters_returnsCorrectDate() {
+        // Arrange
+        val input = "12/04/2025abc"
+        // Act
+        val result = formatDateToDisplay(input)
+        // Assert
+        assertEquals("12 Abr 2025", result)
+    }
+
 }

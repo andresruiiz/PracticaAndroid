@@ -22,12 +22,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SliderDefaults.Thumb
 import androidx.compose.material3.Text
@@ -52,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import es.andresruiz.core.utils.convertMillisToDate
+import es.andresruiz.core.utils.getCurrentDateInMillis
 import es.andresruiz.practicaandroid.R
 import es.andresruiz.practicaandroid.ui.components.CheckboxItem
 import es.andresruiz.practicaandroid.ui.components.TopBar
@@ -177,6 +180,19 @@ fun DateFilterSection(
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
 
+    // Fecha actual en milisegundos (límite superior para ambos calendarios)
+    val currentDateMillis = getCurrentDateInMillis()
+
+    // Fecha "desde" en milisegundos (límite inferior para el calendario "hasta")
+    val fechaDesdeMillis = if (fechaDesde.isNotEmpty()) {
+        es.andresruiz.core.utils.convertDateStringToMillis(fechaDesde)
+    } else null
+
+    // Fecha "hasta" en milisegundos (límite superior para el calendario "desde")
+    val fechaHastaMillis = if (fechaHasta.isNotEmpty()) {
+        es.andresruiz.core.utils.convertDateStringToMillis(fechaHasta)
+    } else null
+
     Text(
         text = stringResource(R.string.con_fecha_emision),
         fontWeight = FontWeight.Medium,
@@ -232,7 +248,16 @@ fun DateFilterSection(
                     viewModel.setFechaDesde(convertMillisToDate(it))
                 }
             },
-            onDismiss = { showStartDatePicker = false }
+            onDismiss = { showStartDatePicker = false },
+            maxDate = if (fechaHastaMillis != null) {
+                // No permitir seleccionar fechas posteriores a la fecha "hasta"
+                minOf(fechaHastaMillis, currentDateMillis)
+            } else {
+                // Si no hay fecha "hasta", el límite es la fecha actual
+                currentDateMillis
+            },
+            minDate = null, // Sin restricción en la fecha mínima para "desde"
+            initialSelectedDateMillis = fechaDesdeMillis ?: currentDateMillis
         )
     }
 
@@ -244,7 +269,10 @@ fun DateFilterSection(
                     viewModel.setFechaHasta(convertMillisToDate(it))
                 }
             },
-            onDismiss = { showEndDatePicker = false }
+            onDismiss = { showEndDatePicker = false },
+            maxDate = currentDateMillis, // No permitir seleccionar fechas posteriores a hoy
+            minDate = fechaDesdeMillis, // No permitir seleccionar fechas anteriores a "desde"
+            initialSelectedDateMillis = fechaHastaMillis ?: currentDateMillis
         )
     }
 }
@@ -283,9 +311,23 @@ fun SimpleDateField(
 @Composable
 fun DatePickerModal(
     onDateSelected: (Long?) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    initialSelectedDateMillis: Long? = null,
+    maxDate: Long? = null,
+    minDate: Long? = null
 ) {
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialSelectedDateMillis ?: maxDate,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                // Restringir la selección entre las fechas mínima y máxima
+                return (minDate == null || utcTimeMillis >= minDate) &&
+                        (maxDate == null || utcTimeMillis <= maxDate)
+            }
+
+            override fun isSelectableYear(year: Int): Boolean = true
+        }
+    )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
@@ -309,7 +351,16 @@ fun DatePickerModal(
             }
         }
     ) {
-        DatePicker(state = datePickerState)
+        DatePicker(
+            state = datePickerState,
+            colors = DatePickerDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = MaterialTheme.colorScheme.primary,
+                headlineContentColor = MaterialTheme.colorScheme.onBackground,
+                weekdayContentColor = MaterialTheme.colorScheme.onSurface,
+                subheadContentColor = MaterialTheme.colorScheme.onSurface
+            )
+        )
     }
 }
 

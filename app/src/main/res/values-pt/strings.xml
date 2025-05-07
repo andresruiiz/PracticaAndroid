@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Nome do app -->
+    <string name="app_name">Prática Android</string>
+
+    <!-- Telas -->
+    <string name="facturas">Faturas</string>
+    <string name="smart_solar">Smart Solar</string>
+    <string name="mi_instalacion">Minha instalação</string>
+    <string name="energia">Energia</string>
+    <string name="detalles">Detalhes</string>
+    <string name="consumo">Consumo</string>
+
+    <!-- Início -->
+    <string name="bienvenido">Bem-vindo ao seu app</string>
+    <string name="subtitulo_facturas">Gerencie suas faturas</string>
+    <string name="subtitulo_smartsolar">Monitore sua energia solar</string>
+
+    <!-- Navegação e botões -->
+    <string name="atras">Voltar</string>
+    <string name="reintentar">Tentar novamente</string>
+    <string name="cerrar">Fechar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="aplicar">Aplicar</string>
+    <string name="eliminar_filtros">Limpar filtros</string>
+    <string name="aceptar">Aceitar</string>
+    <string name="ok">OK</string>
+    <string name="informacion">Informação</string>
+
+    <!-- Mensagens de erro / estado -->
+    <string name="mensaje_error">Ops! Algo deu errado</string>
+    <string name="no_datos">Nenhum dado disponível</string>
+    <string name="dialog_message">Esta funcionalidade ainda não está disponível</string>
+    <string name="no_facturas_filtros">Nenhuma fatura corresponde aos filtros selecionados</string>
+
+    <!-- Filtros -->
+    <string name="filtrar_facturas">Filtrar faturas</string>
+    <string name="desde">De:</string>
+    <string name="hasta">Até:</string>
+    <string name="dia_mes_anyo">dia/mês/ano</string>
+    <string name="por_importe">Por valor</string>
+    <string name="por_estado">Por estado</string>
+    <string name="con_fecha_emision">Com data de emissão</string>
+
+    <!-- Estados de faturas -->
+    <string name="pagada">Paga</string>
+    <string name="pagadas">Pagas</string>
+    <string name="anulada">Cancelada</string>
+    <string name="anuladas">Canceladas</string>
+    <string name="pendiente">Pendente de pagamento</string>
+    <string name="pendientes">Pendentes de pagamento</string>
+    <string name="cuota_fija">Parcela fixa</string>
+    <string name="plan_pago">Plano de pagamento</string>
+
+    <!-- Descrições de acessibilidade -->
+    <string name="desc_boton_factura">Botão para abrir os detalhes da fatura</string>
+    <string name="desc_boton_info">Botão de informação</string>
+    <string name="desc_boton_volver">Botão para voltar</string>
+    <string name="desc_boton_filtros">Botão de filtros</string>
+    <string name="desc_logo">Logo do aplicativo</string>
+    <string name="desc_ic_facturas">Ícone de faturas</string>
+    <string name="desc_ic_smartsolar">Ícone do Smart Solar</string>
+    <string name="desc_graf_autoconsumo">Gráfico de autoconsumo</string>
+    <string name="desc_graf_mantenimiento">Gráfico da página em manutenção</string>
+
+    <!-- Smart Solar -->
+    <string name="autoconsumo">Autoconsumo: </string>
+    <string name="porc_instalacion">92%</string>
+    <string name="cau">CAU (Código de Autoconsumo)</string>
+    <string name="estado_solicitud">Status da solicitação de autoconsumo</string>
+    <string name="tipo_autoconsumo">Tipo de autoconsumo</string>
+    <string name="compensacion_excedentes">Compensação de excedentes</string>
+    <string name="potencia_instalacion">Potência da instalação</string>
+    <string name="titulo_dialog_detalles">Status da solicitação de autoconsumo</string>
+    <string name="mensaje_dialog_detalles">O tempo estimado para ativação do autoconsumo é de 1 a 2 meses, podendo variar conforme sua região e distribuidora</string>
+    <string name="texto_instalacion">Aqui estão os dados da sua instalação fotovoltaica em tempo real.</string>
+    <string name="texto_energia">Estamos trabalhando para melhorar o app. Seus painéis solares continuam produzindo e em breve você poderá ver sua produção novamente. Pedimos desculpas pelo transtorno.</string>
+
+    <!-- Mocks -->
+    <string name="config_desarrollo">Configuração de desenvolvimento</string>
+    <string name="usar_mocks">Usar sistema de Mocks</string>
+    <string name="subtitulo_mocks">Ativar para usar dados de teste</string>
+    <string name="mocks_activado">Sistema de mocks ativado</string>
+    <string name="mocks_desactivado">Sistema de mocks desativado</string>
+
+</resources>

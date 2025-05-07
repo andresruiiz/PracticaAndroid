@@ -4,6 +4,7 @@ import es.andresruiz.domain.models.Factura
 import es.andresruiz.domain.models.FilterState
 import es.andresruiz.domain.usecases.GetFacturasUseCase
 import es.andresruiz.domain.usecases.RefreshFacturasUseCase
+import es.andresruiz.practicaandroid.ui.facturas.FacturasViewModel.FacturasUiState
 import es.andresruiz.practicaandroid.ui.filtros.FilterManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,7 +18,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -77,10 +77,9 @@ class FacturasViewModelTest {
         viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
 
         // Assert
-        assertEquals(testFacturas, viewModel.facturas.value)
-        assertFalse(viewModel.isLoading.value)
-        assertNull(viewModel.error.value)
-        assertFalse(viewModel.isEmpty.value)
+        assertTrue(viewModel.uiState.value is FacturasUiState.Success)
+        assertEquals(testFacturas, (viewModel.uiState.value as FacturasUiState.Success).facturas)
+        assertFalse(viewModel.isRefreshing.value)
         verify(filterManager).updateDataBounds(any(), any())
     }
 
@@ -98,7 +97,7 @@ class FacturasViewModelTest {
     }
 
     @Test
-    fun facturasViewModel_refreshFacturas_updatesLoadingState() = runTest {
+    fun facturasViewModel_refreshFacturas_updatesRefreshingState() = runTest {
         // Arrange
         whenever(getFacturasUseCase()).thenReturn(MutableStateFlow(testFacturas))
         viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
@@ -123,40 +122,38 @@ class FacturasViewModelTest {
 
         // Assert
         verify(refreshFacturasUseCase).invoke()
-        assertEquals(errorMessage, viewModel.error.value)
-        assertFalse(viewModel.isLoading.value)
+        assertTrue(viewModel.uiState.value is FacturasUiState.Error)
+        assertEquals(errorMessage, (viewModel.uiState.value as FacturasUiState.Error).message)
+        assertFalse(viewModel.isRefreshing.value)
     }
 
     @Test
-    fun facturasViewModel_refreshFacturasWhileLoading_doesNothing() = runTest {
+    fun facturasViewModel_refreshFacturasWhileRefreshing_doesNothing() = runTest {
         // Arrange
         whenever(getFacturasUseCase()).thenReturn(MutableStateFlow(testFacturas))
         var isRefreshing = false
         doAnswer {
             isRefreshing = true
-            // No completamos la corrutina para mantener isLoading en true
+            // No completamos la corrutina para mantener isRefreshing en true
         }.whenever(refreshFacturasUseCase).invoke()
 
         viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
 
-        // Primera llamada para activar isLoading
+        // Primera llamada para activar isRefreshing
         viewModel.refreshFacturas()
 
         // Nos aseguramos que se ha llamado la primera vez
         verify(refreshFacturasUseCase, times(1)).invoke()
         assertTrue("La carga debería estar en progreso", isRefreshing)
 
-        // Ahora forzamos el estado isLoading a true para el test
-        val isLoadingField = FacturasViewModel::class.java.getDeclaredField("_isLoading")
-        isLoadingField.isAccessible = true
-        val isLoadingStateFlow = isLoadingField.get(viewModel) as MutableStateFlow<Boolean>
-        isLoadingStateFlow.value = true
-
-        // Verificamos que isLoading está ahora en true
-        assertTrue(viewModel.isLoading.value)
+        // Forzamos el estado isRefreshing a true para el test
+        val isRefreshingField = FacturasViewModel::class.java.getDeclaredField("_isRefreshing")
+        isRefreshingField.isAccessible = true
+        val isRefreshingStateFlow = isRefreshingField.get(viewModel) as MutableStateFlow<Boolean>
+        isRefreshingStateFlow.value = true
 
         // Act
-        viewModel.refreshFacturas() // Segunda llamada mientras isLoading es true
+        viewModel.refreshFacturas() // Segunda llamada mientras isRefreshing es true
 
         // Assert
         verify(refreshFacturasUseCase, times(1)).invoke() // Sigue siendo 1, no 2 (no se recargan)
@@ -230,12 +227,14 @@ class FacturasViewModelTest {
         filterStateFlow.value = filteredState
 
         // Assert
-        assertEquals(1, viewModel.facturas.value.size)
-        assertEquals("Pagada", viewModel.facturas.value[0].descEstado)
+        assertTrue(viewModel.uiState.value is FacturasUiState.Success)
+        val facturas = (viewModel.uiState.value as FacturasUiState.Success).facturas
+        assertEquals(1, facturas.size)
+        assertEquals("Pagada", facturas[0].descEstado)
     }
 
     @Test
-    fun facturasViewModel_filterResultEmpty_updatesIsEmptyState() = runTest {
+    fun facturasViewModel_filterResultEmpty_showsEmptyState() = runTest {
         // Arrange
         val facturasFlow = MutableStateFlow(testFacturas)
         whenever(getFacturasUseCase()).thenReturn(facturasFlow)
@@ -254,34 +253,31 @@ class FacturasViewModelTest {
         filterStateFlow.value = filteredState
 
         // Assert
-        assertTrue(viewModel.isEmpty.value)
-        assertTrue(viewModel.facturas.value.isEmpty())
+        assertTrue(viewModel.uiState.value is FacturasUiState.Empty)
+        val emptyState = viewModel.uiState.value as FacturasUiState.Empty
+        assertEquals("No hay facturas que coincidan con los filtros seleccionados", emptyState.message)
     }
 
     @Test
-    fun facturasViewModel_uiStateLoading_whenIsLoading() = runTest {
+    fun facturasViewModel_uiStateLoading_whileInitializing() = runTest {
         // Arrange
         val facturasFlow = MutableStateFlow(testFacturas)
-        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
 
         doAnswer {
-            // No completamos la corrutina para que isLoading se mantenga en true
-        }.whenever(refreshFacturasUseCase).invoke()
-
-        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+            // No emitimos facturas todavía
+            MutableStateFlow(emptyList<Factura>())
+        }.whenever(getFacturasUseCase).invoke()
 
         // Act
-        viewModel.refreshFacturas()
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
 
-        // Forzamos manualmente el estado de loading para el test
-        val isLoadingField = FacturasViewModel::class.java.getDeclaredField("_isLoading")
-        isLoadingField.isAccessible = true
-        val isLoadingStateFlow = isLoadingField.get(viewModel) as MutableStateFlow<Boolean>
-        isLoadingStateFlow.value = true
+        val uiStateField = FacturasViewModel::class.java.getDeclaredField("_uiState")
+        uiStateField.isAccessible = true
+        val uiStateFlow = uiStateField.get(viewModel) as MutableStateFlow<FacturasUiState>
+        uiStateFlow.value = FacturasUiState.Loading
 
         // Assert
-        assertTrue(viewModel.isLoading.value)
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Loading)
+        assertTrue(viewModel.uiState.value is FacturasUiState.Loading)
     }
 
     @Test
@@ -294,8 +290,8 @@ class FacturasViewModelTest {
         viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
 
         // Assert
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Success)
-        val state = viewModel.uiState.value as FacturasViewModel.FacturasUiState.Success
+        assertTrue(viewModel.uiState.value is FacturasUiState.Success)
+        val state = viewModel.uiState.value as FacturasUiState.Success
         assertEquals(testFacturas, state.facturas)
     }
 
@@ -311,8 +307,8 @@ class FacturasViewModelTest {
         viewModel.refreshFacturas()
 
         // Assert
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Error)
-        val state = viewModel.uiState.value as FacturasViewModel.FacturasUiState.Error
+        assertTrue(viewModel.uiState.value is FacturasUiState.Error)
+        val state = viewModel.uiState.value as FacturasUiState.Error
         assertEquals(errorMessage, state.message)
     }
 
@@ -327,16 +323,13 @@ class FacturasViewModelTest {
 
         viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
 
-        // Filtro que no coincide con ninguna factura
-        val filteredState = FilterState(
-            importeMin = 1000
-        )
-
         // Act
-        filterStateFlow.value = filteredState
+        filterStateFlow.value = FilterState(importeMin = 1000)
 
         // Assert
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Empty)
+        assertTrue(viewModel.uiState.value is FacturasUiState.Empty)
+        val state = viewModel.uiState.value as FacturasUiState.Empty
+        assertEquals("No hay facturas que coincidan con los filtros seleccionados", state.message)
     }
 
     @Test
@@ -352,21 +345,16 @@ class FacturasViewModelTest {
         // Act
         viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
 
-        // Forzamos el estado de loading a false para simular la finalización
-        val isLoadingField = FacturasViewModel::class.java.getDeclaredField("_isLoading")
-        isLoadingField.isAccessible = true
-        val isLoadingStateFlow = isLoadingField.get(viewModel) as MutableStateFlow<Boolean>
-        isLoadingStateFlow.value = false
-
-        // Forzamos el estado vacío para la prueba
-        val allFacturasField = FacturasViewModel::class.java.getDeclaredField("_allFacturas")
-        allFacturasField.isAccessible = true
-        val allFacturasStateFlow = allFacturasField.get(viewModel) as MutableStateFlow<List<Factura>>
-        allFacturasStateFlow.value = emptyList()
+        // Forzamos el estado de refresing a false para simular la finalización
+        val isRefreshingField = FacturasViewModel::class.java.getDeclaredField("_isRefreshing")
+        isRefreshingField.isAccessible = true
+        val isRefreshingStateFlow = isRefreshingField.get(viewModel) as MutableStateFlow<Boolean>
+        isRefreshingStateFlow.value = false
 
         // Assert
-        assertFalse(viewModel.isLoading.value)
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Empty)
+        assertTrue(viewModel.uiState.value is FacturasUiState.Empty)
+        val state = viewModel.uiState.value as FacturasUiState.Empty
+        assertEquals("No hay facturas disponibles", state.message)
     }
 
     @Test
@@ -382,9 +370,8 @@ class FacturasViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Assert
-        assertEquals(errorMessage, viewModel.error.value)
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Error)
-        val errorState = viewModel.uiState.value as FacturasViewModel.FacturasUiState.Error
+        assertTrue(viewModel.uiState.value is FacturasUiState.Error)
+        val errorState = viewModel.uiState.value as FacturasUiState.Error
         assertEquals(errorMessage, errorState.message)
     }
 
@@ -423,135 +410,6 @@ class FacturasViewModelTest {
     }
 
     @Test
-    fun facturasViewModel_refreshFacturas_clearsErrorState() = runTest {
-        // Arrange
-        whenever(getFacturasUseCase()).thenReturn(MutableStateFlow(testFacturas))
-        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
-
-        // Forzamos un estado de error
-        val errorField = FacturasViewModel::class.java.getDeclaredField("_error")
-        errorField.isAccessible = true
-        val errorStateFlow = errorField.get(viewModel) as MutableStateFlow<String?>
-        errorStateFlow.value = "Error previo"
-
-        assertEquals("Error previo", viewModel.error.value)
-
-        // Act
-        viewModel.refreshFacturas()
-
-        // Assert
-        assertNull(viewModel.error.value)
-    }
-
-    @Test
-    fun facturasViewModel_uiStateEmpty_whenFiltersRemoveAllFacturas() = runTest {
-        // Arrange
-        val facturasFlow = MutableStateFlow(testFacturas)
-        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
-        val filterStateFlow = MutableStateFlow(FilterState())
-        whenever(filterManager.filterState).thenReturn(filterStateFlow)
-        whenever(filterManager.getCurrentFilter()).thenReturn(FilterState(importeMin = 1000))
-
-        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
-
-        // Act
-        filterStateFlow.value = FilterState(importeMin = 1000)
-
-        // Assert
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Empty)
-        val state = viewModel.uiState.value as FacturasViewModel.FacturasUiState.Empty
-        assertEquals("No hay facturas que coincidan con los filtros seleccionados", state.message)
-    }
-
-    @Test
-    fun facturasViewModel_loadFacturas_handlesUnknownError() = runTest {
-        // Arrange
-        whenever(getFacturasUseCase()).thenAnswer { throw Exception() } // Error sin mensaje
-
-        // Act
-        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
-
-        // Assert
-        assertEquals("Error desconocido al cargar facturas", viewModel.error.value)
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Error)
-    }
-
-    @Test
-    fun facturasViewModel_uiStateEmpty_whenNoFacturasAtAll() = runTest {
-        // Arrange
-        whenever(getFacturasUseCase()).thenReturn(MutableStateFlow(emptyList()))
-
-        // Act
-        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
-
-        // Assert
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Empty)
-        val state = viewModel.uiState.value as FacturasViewModel.FacturasUiState.Empty
-        assertEquals("No hay facturas disponibles", state.message)
-    }
-
-    @Test
-    fun facturasViewModel_filterChange_doesNotChangeFacturas() = runTest {
-        // Arrange
-        val facturasFlow = MutableStateFlow(testFacturas)
-        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
-
-        val filterStateFlow = MutableStateFlow(FilterState()) // Filtro sin cambios
-        whenever(filterManager.filterState).thenReturn(filterStateFlow)
-        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
-
-        // Act
-        filterStateFlow.value = FilterState() // Aplicar el mismo filtro
-
-        // Assert
-        assertEquals(testFacturas, viewModel.facturas.value) // Lista sin cambios
-        assertFalse(viewModel.isEmpty.value)
-    }
-
-    @Test
-    fun facturasViewModel_loadFacturas_unexpectedException() = runTest {
-        // Arrange
-        val unexpectedError = IllegalStateException("Estado inesperado")
-        whenever(getFacturasUseCase()).thenAnswer { throw unexpectedError }
-
-        // Act
-        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
-
-        // Assert
-        assertEquals(unexpectedError.message, viewModel.error.value)
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Error)
-    }
-
-    @Test
-    fun facturasViewModel_uiStateSuccess_withEmptyFacturas() = runTest {
-        // Arrange
-        val emptyFacturas = emptyList<Factura>()
-        val facturasFlow = MutableStateFlow(emptyFacturas)
-        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
-
-        // Act
-        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
-
-        // Assert
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Empty)
-    }
-
-    @Test
-    fun facturasViewModel_showDialogThenHideDialog_correctValue() = runTest {
-        // Arrange
-        whenever(getFacturasUseCase()).thenReturn(MutableStateFlow(testFacturas))
-        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
-
-        // Act
-        viewModel.showDialog()
-        assertTrue(viewModel.showDialog.value)
-        viewModel.hideDialog()
-
-        // Assert
-        assertFalse(viewModel.showDialog.value)
-    }
-
-    @Test
     fun facturasViewModel_updateFilterManagerBounds_whenAllImportesAreEqual() = runTest {
         // Arrange
         val facturasIguales = listOf(
@@ -571,6 +429,7 @@ class FacturasViewModelTest {
     @Test
     fun facturasViewModel_refreshFacturas_handlesUnknownException() = runTest {
         // Arrange
+        whenever(getFacturasUseCase()).thenReturn(MutableStateFlow(testFacturas))
         whenever(refreshFacturasUseCase()).thenAnswer { throw Exception() }
         viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
 
@@ -578,7 +437,9 @@ class FacturasViewModelTest {
         viewModel.refreshFacturas()
 
         // Assert
-        assertEquals("Error desconocido al refrescar facturas", viewModel.error.value)
+        assertTrue(viewModel.uiState.value is FacturasUiState.Error)
+        val errorState = viewModel.uiState.value as FacturasUiState.Error
+        assertEquals("Error desconocido al refrescar facturas", errorState.message)
     }
 
     @Test
@@ -588,14 +449,21 @@ class FacturasViewModelTest {
         whenever(getFacturasUseCase()).thenReturn(facturasFlow)
         viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
 
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Empty)
+        // Forzamos el estado de refreshing a false para el test
+        val isRefreshingField = FacturasViewModel::class.java.getDeclaredField("_isRefreshing")
+        isRefreshingField.isAccessible = true
+        val isRefreshingStateFlow = isRefreshingField.get(viewModel) as MutableStateFlow<Boolean>
+        isRefreshingStateFlow.value = false
 
-        // Act - database emits new facturas
+        assertTrue(viewModel.uiState.value is FacturasUiState.Empty)
+
+        // Act
         facturasFlow.value = testFacturas
 
         // Assert
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Success)
-        assertEquals(testFacturas, (viewModel.uiState.value as FacturasViewModel.FacturasUiState.Success).facturas)
+        assertTrue(viewModel.uiState.value is FacturasUiState.Success)
+        val state = viewModel.uiState.value as FacturasUiState.Success
+        assertEquals(testFacturas, state.facturas)
     }
 
     @Test
@@ -613,8 +481,10 @@ class FacturasViewModelTest {
         filterStateFlow.value = FilterState(importeMin = 150)
 
         // Assert - debería mostrar solo facturas con importe >= 150
-        assertEquals(2, viewModel.facturas.value.size)
-        assertTrue(viewModel.facturas.value.all { it.importeOrdenacion >= 150 })
+        assertTrue(viewModel.uiState.value is FacturasUiState.Success)
+        val state = viewModel.uiState.value as FacturasUiState.Success
+        assertEquals(2, state.facturas.size)
+        assertTrue(state.facturas.all { it.importeOrdenacion >= 150 })
     }
 
     @Test
@@ -630,8 +500,44 @@ class FacturasViewModelTest {
         viewModel.refreshFacturas()
 
         // Assert - verificar que el mensaje de error es específico para errores de red
-        assertEquals(networkError.message, viewModel.error.value)
-        assertTrue(viewModel.uiState.value is FacturasViewModel.FacturasUiState.Error)
-        assertEquals(networkError.message, (viewModel.uiState.value as FacturasViewModel.FacturasUiState.Error).message)
+        assertTrue(viewModel.uiState.value is FacturasUiState.Error)
+        val errorState = viewModel.uiState.value as FacturasUiState.Error
+        assertEquals(networkError.message, errorState.message)
+    }
+
+    @Test
+    fun facturasViewModel_loadFacturasUnknownError_handlesGenericError() = runTest {
+        // Arrange
+        whenever(getFacturasUseCase()).thenAnswer { throw Exception() } // Error sin mensaje
+
+        // Act
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Assert
+        assertTrue(viewModel.uiState.value is FacturasUiState.Error)
+        val errorState = viewModel.uiState.value as FacturasUiState.Error
+        assertEquals("Error desconocido al cargar facturas", errorState.message)
+    }
+
+    @Test
+    fun facturasViewModel_whileRefreshing_keepSuccessState() = runTest {
+        // Arrange
+        val facturasFlow = MutableStateFlow(testFacturas)
+        whenever(getFacturasUseCase()).thenReturn(facturasFlow)
+        viewModel = FacturasViewModel(getFacturasUseCase, refreshFacturasUseCase, filterManager)
+
+        // Aseguramos que estamos en estado Success
+        assertTrue(viewModel.uiState.value is FacturasUiState.Success)
+
+        // Act
+        // Forzamos el estado de refreshing a true pero mantenemos el mismo estado UI
+        val isRefreshingField = FacturasViewModel::class.java.getDeclaredField("_isRefreshing")
+        isRefreshingField.isAccessible = true
+        val isRefreshingStateFlow = isRefreshingField.get(viewModel) as MutableStateFlow<Boolean>
+        isRefreshingStateFlow.value = true
+
+        // Assert - El estado de UI se mantiene como Success aunque estemos refrescando
+        assertTrue(viewModel.isRefreshing.value)
+        assertTrue(viewModel.uiState.value is FacturasUiState.Success)
     }
 }

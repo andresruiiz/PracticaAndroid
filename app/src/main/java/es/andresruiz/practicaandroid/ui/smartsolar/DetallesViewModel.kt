@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import es.andresruiz.domain.models.Detalles
 import es.andresruiz.domain.usecases.GetDetallesUseCase
+import es.andresruiz.practicaandroid.R
+import es.andresruiz.practicaandroid.util.ResourceProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +19,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class DetallesViewModel @Inject constructor(
-    private val getDetallesUseCase: GetDetallesUseCase
+    private val getDetallesUseCase: GetDetallesUseCase,
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DetallesUiState>(DetallesUiState.Loading)
@@ -34,7 +37,7 @@ class DetallesViewModel @Inject constructor(
                 val detalles = getDetallesUseCase()
 
                 if (detalles.cau.isBlank() && detalles.estadoSolicitud.isBlank()) {
-                    _uiState.value = DetallesUiState.Empty("No hay detalles disponibles para mostrar")
+                    _uiState.value = DetallesUiState.Empty(resourceProvider.getString(R.string.no_detalles))
                 } else {
                     _uiState.value = DetallesUiState.Success(detalles)
                 }

@@ -33,6 +33,11 @@
     <string name="no_datos">Nenhum dado disponível</string>
     <string name="dialog_message">Esta funcionalidade ainda não está disponível</string>
     <string name="no_facturas_filtros">Nenhuma fatura corresponde aos filtros selecionados</string>
+    <string name="no_facturas">Nenhuma fatura disponível</string>
+    <string name="error_cargar_facturas">Erro desconhecido ao carregar faturas</string>
+    <string name="error_regargar_facturas">Erro desconhecido ao atualizar faturas</string>
+    <string name="no_detalles">Sem detalhe disponível para exibir</string>
+    <string name="error_cargar_detalles">Erro ao carregar detalhes</string>
 
     <!-- Filtros -->
     <string name="filtrar_facturas">Filtrar faturas</string>

@@ -33,6 +33,11 @@
     <string name="no_datos">No data available</string>
     <string name="dialog_message">This feature is not available yet</string>
     <string name="no_facturas_filtros">No invoices match the selected filters</string>
+    <string name="no_facturas">No invoices available</string>
+    <string name="error_cargar_facturas">Unknown error when uploading invoices</string>
+    <string name="error_regargar_facturas">Unknown error when refreshing invoices</string>
+    <string name="no_detalles">No details available to display</string>
+    <string name="error_cargar_detalles">Error loading details</string>
 
     <!-- Filters -->
     <string name="filtrar_facturas">Filter invoices</string>

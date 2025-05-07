@@ -6,7 +6,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import es.andresruiz.domain.models.Factura
 import es.andresruiz.domain.usecases.GetFacturasUseCase
 import es.andresruiz.domain.usecases.RefreshFacturasUseCase
+import es.andresruiz.practicaandroid.R
 import es.andresruiz.practicaandroid.ui.filtros.FilterManager
+import es.andresruiz.practicaandroid.util.ResourceProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +26,8 @@ import kotlin.math.floor
 class FacturasViewModel @Inject constructor(
     private val getFacturasUseCase: GetFacturasUseCase,
     private val refreshFacturasUseCase: RefreshFacturasUseCase,
-    private val filterManager: FilterManager
+    private val filterManager: FilterManager,
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
     // Estado de UI
@@ -60,13 +63,13 @@ class FacturasViewModel @Inject constructor(
                     } else if (_isRefreshing.value) {
                         FacturasUiState.Loading
                     } else {
-                        FacturasUiState.Empty("No hay facturas disponibles")
+                        FacturasUiState.Empty(resourceProvider.getString(R.string.no_facturas))
                     }
                 } else {
                     // Aplicamos filtros a las facturas disponibles
                     val filteredFacturas = filterState.aplicarFiltros(facturas)
                     if (filteredFacturas.isEmpty()) {
-                        FacturasUiState.Empty("No hay facturas que coincidan con los filtros seleccionados")
+                        FacturasUiState.Empty(resourceProvider.getString(R.string.no_facturas_filtros))
                     } else {
                         FacturasUiState.Success(filteredFacturas)
                     }
@@ -95,7 +98,7 @@ class FacturasViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                _uiState.value = FacturasUiState.Error(e.message ?: "Error desconocido al cargar facturas")
+                _uiState.value = FacturasUiState.Error(e.message ?: resourceProvider.getString(R.string.error_cargar_facturas))
             }
         }
     }
@@ -132,7 +135,7 @@ class FacturasViewModel @Inject constructor(
             try {
                 refreshFacturasUseCase()
             } catch (e: Exception) {
-                _uiState.value = FacturasUiState.Error(e.message ?: "Error desconocido al refrescar facturas")
+                _uiState.value = FacturasUiState.Error(e.message ?: resourceProvider.getString(R.string.error_regargar_facturas))
             } finally {
                 _isRefreshing.value = false
             }

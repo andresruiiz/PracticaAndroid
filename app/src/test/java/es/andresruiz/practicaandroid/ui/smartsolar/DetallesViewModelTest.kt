@@ -2,6 +2,8 @@ package es.andresruiz.practicaandroid.ui.smartsolar
 
 import es.andresruiz.domain.models.Detalles
 import es.andresruiz.domain.usecases.GetDetallesUseCase
+import es.andresruiz.practicaandroid.R
+import es.andresruiz.practicaandroid.util.ResourceProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -23,6 +25,7 @@ class DetallesViewModelTest {
 
     private lateinit var viewModel: DetallesViewModel
     private lateinit var getDetallesUseCase: GetDetallesUseCase
+    private lateinit var resourceProvider: ResourceProvider
 
     private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
 
@@ -42,12 +45,22 @@ class DetallesViewModelTest {
         potenciaInstalacion = ""
     )
 
+    // Mensajes de error
+    private val mockNoDetallesMessage = "No hay detalles disponibles para mostrar"
+    private val mockErrorMessage = "Error al cargar los detalles"
+
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
         // Inicializar mocks
         getDetallesUseCase = mock()
+        resourceProvider = mock()
+
+        whenever(resourceProvider.getString(R.string.no_detalles))
+            .thenReturn(mockNoDetallesMessage)
+        whenever(resourceProvider.getString(R.string.error_cargar_detalles))
+            .thenReturn(mockErrorMessage)
     }
 
     @After
@@ -61,7 +74,7 @@ class DetallesViewModelTest {
         whenever(getDetallesUseCase()).thenReturn(mockDetalles)
 
         // Act
-        viewModel = DetallesViewModel(getDetallesUseCase)
+        viewModel = DetallesViewModel(getDetallesUseCase, resourceProvider)
 
         // Assert
         val currentState = viewModel.uiState.value
@@ -75,11 +88,12 @@ class DetallesViewModelTest {
         whenever(getDetallesUseCase()).thenReturn(emptyDetalles)
 
         // Act
-        viewModel = DetallesViewModel(getDetallesUseCase)
+        viewModel = DetallesViewModel(getDetallesUseCase, resourceProvider)
 
         // Assert
         val currentState = viewModel.uiState.value
         assertTrue(currentState is DetallesUiState.Empty)
+        assertEquals(mockNoDetallesMessage, (currentState as DetallesUiState.Empty).message)
     }
 
     @Test
@@ -89,7 +103,7 @@ class DetallesViewModelTest {
         whenever(getDetallesUseCase()).thenThrow(RuntimeException(errorMessage))
 
         // Act
-        viewModel = DetallesViewModel(getDetallesUseCase)
+        viewModel = DetallesViewModel(getDetallesUseCase, resourceProvider)
 
         // Assert
         val currentState = viewModel.uiState.value
@@ -108,7 +122,7 @@ class DetallesViewModelTest {
             .thenReturn(mockDetalles)
 
         // Primer intento (falla)
-        viewModel = DetallesViewModel(getDetallesUseCase)
+        viewModel = DetallesViewModel(getDetallesUseCase, resourceProvider)
 
         // Verificamos que estamos en estado de error
         assertTrue(viewModel.uiState.value is DetallesUiState.Error)
@@ -130,7 +144,7 @@ class DetallesViewModelTest {
         whenever(getDetallesUseCase()).thenReturn(mockDetalles)
 
         // Act
-        viewModel = DetallesViewModel(getDetallesUseCase)
+        viewModel = DetallesViewModel(getDetallesUseCase, resourceProvider)
 
         // Assert
         assertTrue(viewModel.uiState.value is DetallesUiState.Loading)
@@ -144,12 +158,12 @@ class DetallesViewModelTest {
         whenever(getDetallesUseCase()).thenThrow(RuntimeException())
 
         // Act
-        viewModel = DetallesViewModel(getDetallesUseCase)
+        viewModel = DetallesViewModel(getDetallesUseCase, resourceProvider)
 
         // Assert
         val currentState = viewModel.uiState.value
         assertTrue(currentState is DetallesUiState.Error)
-        assertEquals("Error al cargar los detalles", (currentState as DetallesUiState.Error).message)
+        assertEquals(mockErrorMessage, (currentState as DetallesUiState.Error).message)
     }
 
     @Test
@@ -165,7 +179,7 @@ class DetallesViewModelTest {
         whenever(getDetallesUseCase()).thenReturn(detallesParciales)
 
         // Act
-        viewModel = DetallesViewModel(getDetallesUseCase)
+        viewModel = DetallesViewModel(getDetallesUseCase, resourceProvider)
 
         // Assert
         val currentState = viewModel.uiState.value

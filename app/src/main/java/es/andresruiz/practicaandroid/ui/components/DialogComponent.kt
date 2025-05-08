@@ -43,6 +43,7 @@ fun InfoDialog(
                 textAlign = TextAlign.Center
             )
         },
+        containerColor = MaterialTheme.colorScheme.background,
         shape = AppShapes.DialogShape,
         confirmButton = {
             Box(

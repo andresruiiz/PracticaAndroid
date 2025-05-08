@@ -42,7 +42,7 @@ class DetallesViewModel @Inject constructor(
                     _uiState.value = DetallesUiState.Success(detalles)
                 }
             } catch (e: Exception) {
-                _uiState.value = DetallesUiState.Error(e.message ?: "Error al cargar los detalles")
+                _uiState.value = DetallesUiState.Error(resourceProvider.getString(R.string.error_cargar_detalles))
             }
         }
     }

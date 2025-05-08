@@ -7,7 +7,7 @@ import es.andresruiz.domain.usecases.RefreshFacturasUseCase
 import es.andresruiz.practicaandroid.R
 import es.andresruiz.practicaandroid.ui.facturas.FacturasViewModel.FacturasUiState
 import es.andresruiz.practicaandroid.ui.filtros.FilterManager
-import es.andresruiz.practicaandroid.util.ResourceProvider
+import es.andresruiz.core.utils.ResourceProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

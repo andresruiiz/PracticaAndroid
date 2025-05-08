@@ -3,7 +3,7 @@ package es.andresruiz.practicaandroid.ui.smartsolar
 import es.andresruiz.domain.models.Detalles
 import es.andresruiz.domain.usecases.GetDetallesUseCase
 import es.andresruiz.practicaandroid.R
-import es.andresruiz.practicaandroid.util.ResourceProvider
+import es.andresruiz.core.utils.ResourceProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher

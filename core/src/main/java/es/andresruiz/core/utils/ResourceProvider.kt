@@ -1,4 +1,4 @@
-package es.andresruiz.practicaandroid.util
+package es.andresruiz.core.utils
 
 import android.content.Context
 import androidx.annotation.StringRes

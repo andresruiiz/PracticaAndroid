@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import es.andresruiz.domain.models.Detalles
 import es.andresruiz.domain.usecases.GetDetallesUseCase
 import es.andresruiz.practicaandroid.R
-import es.andresruiz.practicaandroid.util.ResourceProvider
+import es.andresruiz.core.utils.ResourceProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

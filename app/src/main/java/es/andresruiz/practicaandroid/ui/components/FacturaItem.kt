@@ -55,9 +55,15 @@ fun FacturaItem(factura: Factura, modifier: Modifier = Modifier, onClick: () -> 
                 )
 
                 // El estado sólo aparece si la factura está pendiente de pago
-                if (factura.descEstado == stringResource(R.string.pendiente)) {
+                if (factura.descEstado != "Pagada") {
                     Text(
-                        text = factura.descEstado,
+                        text = when(factura.descEstado) {
+                            "Anulada" -> stringResource(R.string.anulada)
+                            "Cuota Fija" -> stringResource(R.string.cuota_fija)
+                            "Pendiente de pago" -> stringResource(R.string.pendiente)
+                            "Plan de pago" -> stringResource(R.string.plan_pago)
+                            else -> ""
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error
                     )

@@ -1,65 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Práctica Android</string>
-    <string name="facturas">Facturas</string>
+
+    <!-- App name -->
+    <string name="app_name">Android Practice</string>
+
+    <!-- Screens -->
+    <string name="facturas">Invoices</string>
     <string name="smart_solar">Smart Solar</string>
-    <string name="filtrar_facturas">Filtrar facturas</string>
-    <string name="consumo">Consumo</string>
-    <string name="atras">Atrás</string>
-    <string name="mensaje_error">¡Ups! Algo salió mal</string>
-    <string name="no_datos">No hay datos disponibles</string>
-    <string name="reintentar">Reintentar</string>
-    <string name="cerrar">Cerrar</string>
-    <string name="desc_boton_factura">Botón para abrir detalles de la factura</string>
-    <string name="desc_boton_info">Botón de información</string>
-    <string name="desc_boton_volver">Botón para volver</string>
-    <string name="desc_boton_filtros">Botón de filtros</string>
-    <string name="informacion">Información</string>
-    <string name="dialog_message">Esta funcionalidad aún no está disponible</string>
-    <string name="no_facturas_filtros">No hay facturas que coincidan con los filtros seleccionados</string>
-    <string name="pagada">Pagada</string>
-    <string name="pagadas">Pagadas</string>
-    <string name="anulada">Anulada</string>
-    <string name="anuladas">Anuladas</string>
-    <string name="cuota_fija">Cuota Fija</string>
-    <string name="pendiente">Pendiente de pago</string>
-    <string name="pendientes">Pendientes de pago</string>
-    <string name="plan_pago">Plan de pago</string>
-    <string name="con_fecha_emision">Con fecha de emisión</string>
-    <string name="desde">Desde:</string>
-    <string name="hasta">Hasta:</string>
-    <string name="dia_mes_anyo">día/mes/año</string>
-    <string name="cancelar">Cancelar</string>
-    <string name="por_importe">Por un importe</string>
-    <string name="por_estado">Por estado</string>
-    <string name="aplicar">Aplicar</string>
-    <string name="eliminar_filtros">Eliminar filtros</string>
-    <string name="desc_logo">Logo de la aplicación</string>
-    <string name="desc_ic_facturas">Icono de facturas</string>
-    <string name="desc_ic_smartsolar">Icono de Smart Solar</string>
-    <string name="bienvenido">Bienvenido a tu app</string>
-    <string name="mocks_activado">Sistema de mocks activado</string>
-    <string name="mocks_desactivado">Sistema de mocks desactivado</string>
-    <string name="subtitulo_facturas">Gestiona tus facturas</string>
-    <string name="subtitulo_smartsolar">Monitoriza tu energía solar</string>
-    <string name="config_desarrollo">Configuración de desarrollo</string>
-    <string name="usar_mocks">Usar sistema de Mocks</string>
-    <string name="subtitulo_mocks">Activar para usar datos de prueba</string>
-    <string name="mi_instalacion">Mi instalación</string>
-    <string name="energia">Energía</string>
-    <string name="detalles">Detalles</string>
-    <string name="texto_instalacion">Aquí tienes los datos de tu instalación fotovoltaica en tiempo real.</string>
-    <string name="autoconsumo">Autoconsumo: </string>
-    <string name="porc_instalacion">92%</string>
-    <string name="desc_graf_autoconsumo">Gráfico de autoconsumo</string>
-    <string name="desc_graf_mantenimiento">Gráfico de página en mantenimiento</string>
-    <string name="texto_energia">Estamos trabajando en mejorar la App. Tus paneles solares siguen produciendo, en breve podrás seguir viendo tu producción solar. Sentimos las molestias.</string>
-    <string name="cau">CAU (Código Autoconsumo)</string>
-    <string name="estado_solicitud">Estado solicitud alta autoconsumidor</string>
-    <string name="tipo_autoconsumo">Tipo autoconsumo</string>
-    <string name="compensacion_excedentes">Compensación de excedentes</string>
-    <string name="potencia_instalacion">Potencia de instalación</string>
-    <string name="titulo_dialog_detalles">Estado solicitud autoconsumo</string>
-    <string name="mensaje_dialog_detalles">El tiempo estimado de activación de tu autoconsumo es de 1 a 2 meses, éste variará en función de tu comunidad autónoma y distribuidora</string>
-    <string name="aceptar">Aceptar</string>
+    <string name="mi_instalacion">My Installation</string>
+    <string name="energia">Energy</string>
+    <string name="detalles">Details</string>
+    <string name="consumo">Consumption</string>
+
+    <!-- Homepage -->
+    <string name="bienvenido">Welcome to your app</string>
+    <string name="subtitulo_facturas">Manage your invoices</string>
+    <string name="subtitulo_smartsolar">Monitor your solar energy</string>
+
+    <!-- Navigation and buttons -->
+    <string name="atras">Back</string>
+    <string name="reintentar">Retry</string>
+    <string name="cerrar">Close</string>
+    <string name="cancelar">Cancel</string>
+    <string name="aplicar">Apply</string>
+    <string name="eliminar_filtros">Clear filters</string>
+    <string name="aceptar">Accept</string>
     <string name="ok">OK</string>
+    <string name="informacion">Information</string>
+
+    <!-- Error / status messages -->
+    <string name="mensaje_error">Oops! Something went wrong</string>
+    <string name="no_datos">No data available</string>
+    <string name="dialog_message">This feature is not available yet</string>
+    <string name="no_facturas_filtros">No invoices match the selected filters</string>
+    <string name="no_facturas">No invoices available</string>
+    <string name="error_cargar_facturas">Unknown error when uploading invoices</string>
+    <string name="error_regargar_facturas">Unknown error when refreshing invoices</string>
+    <string name="no_detalles">No details available to display</string>
+    <string name="error_cargar_detalles">Error loading details</string>
+
+    <!-- Filters -->
+    <string name="filtrar_facturas">Filter invoices</string>
+    <string name="desde">From:</string>
+    <string name="hasta">To:</string>
+    <string name="dia_mes_anyo">day/month/year</string>
+    <string name="por_importe">By amount</string>
+    <string name="por_estado">By status</string>
+    <string name="con_fecha_emision">With issue date</string>
+
+    <!-- Invoice statuses -->
+    <string name="pagada">Paid</string>
+    <string name="pagadas">Paid</string>
+    <string name="anulada">Cancelled</string>
+    <string name="anuladas">Cancelled</string>
+    <string name="pendiente">Pending payment</string>
+    <string name="pendientes">Pending payment</string>
+    <string name="cuota_fija">Fixed fee</string>
+    <string name="plan_pago">Payment plan</string>
+
+    <!-- Accessibility descriptions -->
+    <string name="desc_boton_factura">Button to open invoice details</string>
+    <string name="desc_boton_info">Information button</string>
+    <string name="desc_boton_volver">Back button</string>
+    <string name="desc_boton_filtros">Filter button</string>
+    <string name="desc_logo">App logo</string>
+    <string name="desc_ic_facturas">Invoices icon</string>
+    <string name="desc_ic_smartsolar">Smart Solar icon</string>
+    <string name="desc_graf_autoconsumo">Self-consumption chart</string>
+    <string name="desc_graf_mantenimiento">Maintenance page chart</string>
+
+    <!-- Smart Solar -->
+    <string name="autoconsumo">Self-consumption: </string>
+    <string name="porc_instalacion">92%</string>
+    <string name="cau">CAU (Self-consumption Code)</string>
+    <string name="estado_solicitud">Self-consumer application status</string>
+    <string name="tipo_autoconsumo">Self-consumption type</string>
+    <string name="compensacion_excedentes">Surplus compensation</string>
+    <string name="potencia_instalacion">Installation power</string>
+    <string name="titulo_dialog_detalles">Self-consumption application status</string>
+    <string name="mensaje_dialog_detalles">The estimated activation time for your self-consumption system is 1 to 2 months. This may vary depending on your autonomous community and electricity distributor.</string>
+    <string name="texto_instalacion">Here are the real-time details of your photovoltaic installation.</string>
+    <string name="texto_energia">We are working to improve the app. Your solar panels are still generating power, and you\'ll soon be able to monitor your production again. Sorry for the inconvenience.</string>
+
+    <!-- Mocks -->
+    <string name="config_desarrollo">Development settings</string>
+    <string name="usar_mocks">Use Mock system</string>
+    <string name="subtitulo_mocks">Enable to use test data</string>
+    <string name="mocks_activado">Mock system enabled</string>
+    <string name="mocks_desactivado">Mock system disabled</string>
+
 </resources>

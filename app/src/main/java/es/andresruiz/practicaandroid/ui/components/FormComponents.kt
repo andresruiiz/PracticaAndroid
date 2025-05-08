@@ -1,6 +1,7 @@
 package es.andresruiz.practicaandroid.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -110,17 +111,16 @@ fun CheckboxItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(40.dp)
+            .clickable { onCheckedChange(!isChecked) } // Hace clicable toda la fila
+            .padding(start = 4.dp, end = 8.dp)
     ) {
         Checkbox(
             checked = isChecked,
-            onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(
-                checkedColor = MaterialTheme.colorScheme.primary,
-                uncheckedColor = MaterialTheme.colorScheme.outline
-            )
+            onCheckedChange = null // Evita duplicar el evento
         )
         Text(
-            text = text
+            text = text,
+            modifier = Modifier.padding(start = 8.dp)
         )
     }
 }

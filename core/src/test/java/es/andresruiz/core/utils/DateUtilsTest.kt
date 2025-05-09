@@ -99,6 +99,41 @@ class DateUtilsTest {
     }
 
     @Test
+    fun formatDateToDisplay_monthWithPeriod_removesDot() {
+        // Arrange
+        val input = "01/01/2025"
+        val originalLocale = Locale.getDefault()
+        Locale.setDefault(Locale("es", "ES")) // Forzar "ene."
+
+        // Act
+        val result = formatDateToDisplay(input)
+
+        // Assert
+        assertEquals("01 Ene 2025", result)
+
+        // Clean up
+        Locale.setDefault(originalLocale)
+    }
+
+    @Test
+    fun formatDateToDisplay_monthAllLowercase_capitalizedProperly() {
+        // Arrange
+        val input = "15/03/2025"
+        val originalLocale = Locale.getDefault()
+        Locale.setDefault(Locale("es"))
+
+        // Act
+        val result = formatDateToDisplay(input)
+
+        // Assert
+        assertEquals("15 Mar 2025", result)
+
+        // Clean up
+        Locale.setDefault(originalLocale)
+    }
+
+
+    @Test
     fun convertMillisToDate_positiveMillis_formatsCorrectly() {
         // Arrange
         val millis = 1735689600000L // 01/01/2025
@@ -145,5 +180,109 @@ class DateUtilsTest {
         // Assert
         assertEquals("12 Abr 2025", result)
     }
+
+    @Test
+    fun convertDateStringToMillis_validDate_returnsCorrectMillis() {
+        // Arrange
+        val inputDate = "01/01/2025"
+        val expectedMillis = 1735686000000L
+
+        // Act
+        val result = convertDateStringToMillis(inputDate)
+
+        // Assert
+        assertEquals(expectedMillis, result)
+    }
+
+    @Test
+    fun convertDateStringToMillis_invalidDate_returnsNull() {
+        // Arrange
+        val invalidDate = "not-a-date"
+
+        // Act
+        val result = convertDateStringToMillis(invalidDate)
+
+        // Assert
+        assertEquals(null, result)
+    }
+
+    @Test
+    fun getCurrentDateInMillis_returnsCurrentTimeInMillis() {
+        // Arrange
+        val before = System.currentTimeMillis()
+
+        // Act
+        val currentMillis = getCurrentDateInMillis()
+
+        // Assert
+        val after = System.currentTimeMillis()
+        assert(currentMillis in before..after)
+    }
+
+    @Test
+    fun isDateAfter_firstDateAfterSecond_returnsTrue() {
+        // Arrange
+        val date1 = "02/01/2025"
+        val date2 = "01/01/2025"
+
+        // Act
+        val result = isDateAfter(date1, date2)
+
+        // Assert
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun isDateAfter_firstDateBeforeSecond_returnsFalse() {
+        // Arrange
+        val date1 = "01/01/2024"
+        val date2 = "01/01/2025"
+
+        // Act
+        val result = isDateAfter(date1, date2)
+
+        // Assert
+        assertEquals(false, result)
+    }
+
+    @Test
+    fun isDateAfter_invalidFirstDate_returnsFalse() {
+        // Arrange
+        val date1 = "not-a-date"
+        val date2 = "01/01/2025"
+
+        // Act
+        val result = isDateAfter(date1, date2)
+
+        // Assert
+        assertEquals(false, result)
+    }
+
+    @Test
+    fun isDateAfter_invalidSecondDate_returnsFalse() {
+        // Arrange
+        val date1 = "01/01/2025"
+        val date2 = "not-a-date"
+
+        // Act
+        val result = isDateAfter(date1, date2)
+
+        // Assert
+        assertEquals(false, result)
+    }
+
+    @Test
+    fun isDateAfter_bothDatesInvalid_returnsFalse() {
+        // Arrange
+        val date1 = "invalid1"
+        val date2 = "invalid2"
+
+        // Act
+        val result = isDateAfter(date1, date2)
+
+        // Assert
+        assertEquals(false, result)
+    }
+
 
 }

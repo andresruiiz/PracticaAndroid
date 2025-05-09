@@ -12,16 +12,14 @@ fun formatDateToDisplay(date: String): String {
         val parsedDate = inputFormat.parse(date)
         parsedDate?.let {
             val formatted = outputFormat.format(it)
-            // Primera letra del mes en mayúscula
-            formatted.split(" ").joinToString(" ") { part ->
-                if (part.length == 3) {
-                    part.replaceFirstChar { char ->
-                        char.titlecase(Locale.getDefault())
-                    }
-                } else {
-                    part
-                }
-            }
+            val parts = formatted.split(" ")
+
+            // Capitaliza el mes y elimina punto final si lo hay
+            val day = parts[0]
+            val month = parts[1].removeSuffix(".").replaceFirstChar { it.titlecase(Locale.getDefault()) }
+            val year = parts[2]
+
+            "$day $month $year"
         } ?: date
     } catch (e: Exception) {
         date // Devuelve la fecha original si hay error

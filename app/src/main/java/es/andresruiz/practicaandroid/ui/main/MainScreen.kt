@@ -3,6 +3,8 @@ package es.andresruiz.practicaandroid.ui.main
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,6 +41,8 @@ fun MainScreen(navController: NavController) {
     val coroutineScope = remember { CoroutineScope(Dispatchers.IO) }
 
     var useMock by remember { mutableStateOf(false) }
+
+    val scrollState = rememberScrollState()
 
     // Consulto en DataStore el estado de use_mock (solo en DEBUG)
     if (BuildConfig.DEBUG) {
@@ -78,6 +82,7 @@ fun MainScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(scrollState)
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),

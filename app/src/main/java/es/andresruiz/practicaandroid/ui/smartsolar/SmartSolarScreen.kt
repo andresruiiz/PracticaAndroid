@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -143,6 +145,7 @@ fun MiInstalacionScreen() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(AppTheme.Spacing.medium)
+            .verticalScroll(rememberScrollState())
     ) {
         Text(
             text = stringResource(R.string.texto_instalacion),
@@ -176,7 +179,8 @@ fun EnergiaScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(AppTheme.Spacing.extraHuge),
+            .padding(AppTheme.Spacing.extraHuge)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -209,6 +213,7 @@ fun DetallesScreen(viewModel: DetallesViewModel = hiltViewModel()) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(AppTheme.Spacing.medium)
+            .verticalScroll(rememberScrollState())
     ) {
         when (val state = uiState) {
             is DetallesUiState.Loading -> {

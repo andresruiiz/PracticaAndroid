@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +45,7 @@ import es.andresruiz.practicaandroid.ui.components.LoadingView
 import es.andresruiz.practicaandroid.ui.components.ReadOnlyTextField
 import es.andresruiz.practicaandroid.ui.components.TopBar
 import es.andresruiz.practicaandroid.ui.theme.AppTheme
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla de Smart Solar
@@ -53,6 +58,14 @@ fun SmartSolarScreen(navController: NavController) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     val tabs = listOf(stringResource(R.string.mi_instalacion), stringResource(R.string.energia), stringResource(R.string.detalles))
+
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        initialPageOffsetFraction = 0f,
+        pageCount = { tabs.size }
+    )
+
+    val coroutineScope = rememberCoroutineScope()
 
     val scrollBehavior =
         TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -74,14 +87,14 @@ fun SmartSolarScreen(navController: NavController) {
                 .padding(innerPadding),
         ) {
             ScrollableTabRow(
-                selectedTabIndex = selectedTabIndex,
+                selectedTabIndex = pagerState.currentPage,
                 containerColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.onBackground,
                 edgePadding = 0.dp,
                 indicator = { tabPositions ->
                     // Indicador negro personalizado
                     TabRowDefaults.SecondaryIndicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
                         color = MaterialTheme.colorScheme.onBackground,
                     )
                 },
@@ -89,8 +102,12 @@ fun SmartSolarScreen(navController: NavController) {
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        },
                         text = {
                             Text(
                                 text = title,
@@ -103,10 +120,15 @@ fun SmartSolarScreen(navController: NavController) {
                 }
             }
 
-            when (selectedTabIndex) {
-                0 -> MiInstalacionScreen()
-                1 -> EnergiaScreen()
-                2 -> DetallesScreen()
+            HorizontalPager(
+                state = pagerState,
+                verticalAlignment = Alignment.Top
+            ) { page ->
+                when (page) {
+                    0 -> MiInstalacionScreen()
+                    1 -> EnergiaScreen()
+                    2 -> DetallesScreen()
+                }
             }
         }
     }

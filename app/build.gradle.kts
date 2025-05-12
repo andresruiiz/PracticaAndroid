@@ -76,9 +76,8 @@ dependencies {
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // Vico charts
-    implementation(libs.vico.compose)
-    implementation(libs.vico.compose.m3)
+    // Compose Charts
+    implementation (libs.compose.charts)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)

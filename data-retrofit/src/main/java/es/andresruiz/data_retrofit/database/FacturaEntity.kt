@@ -9,5 +9,7 @@ data class FacturaEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "desc_estado") val descEstado: String,
     @ColumnInfo(name = "importe_ordenacion") val importeOrdenacion: Double,
+    @ColumnInfo(name = "consumo_punta") val consumoPunta: Double,
+    @ColumnInfo(name = "consumo_llenas") val consumoLlenas: Double,
     @ColumnInfo(name = "fecha") val fecha: String
 )

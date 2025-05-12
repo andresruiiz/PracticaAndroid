@@ -4,41 +4,57 @@
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 1.5600000000000001,
+      "consumoPunta": 200.0,
+      "consumoLlano": 100.0,
       "fecha": "07/02/2019"
     },
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 25.140000000000001,
+      "consumoPunta": 200.0,
+      "consumoLlano": 100.0,
       "fecha": "05/02/2019"
     },
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 22.690000000000001,
+      "consumoPunta": 200.0,
+      "consumoLlano": 100.0,
       "fecha": "08/01/2019"
     },
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 12.84,
+      "consumoPunta": 200.0,
+      "consumoLlano": 100.0,
       "fecha": "07/12/2018"
     },
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 35.159999999999997,
+      "consumoPunta": 200.0,
+      "consumoLlano": 100.0,
       "fecha": "16/11/2018"
     },
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 18.27,
+      "consumoPunta": 200.0,
+      "consumoLlano": 100.0,
       "fecha": "05/10/2018"
     },
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 61.170000000000002,
+      "consumoPunta": 200.0,
+      "consumoLlano": 100.0,
       "fecha": "05/09/2018"
     },
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 37.18,
+      "consumoPunta": 200.0,
+      "consumoLlano": 100.0,
       "fecha": "07/08/2018"
     }
   ]

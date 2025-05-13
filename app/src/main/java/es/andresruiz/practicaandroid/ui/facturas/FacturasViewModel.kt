@@ -45,6 +45,10 @@ class FacturasViewModel @Inject constructor(
     // Almacenamiento local de todas las facturas
     private val _allFacturas = MutableStateFlow<List<Factura>>(emptyList())
 
+    // Estado para el tipo de gráfica (precio o consumo)
+    private val _chartMode = MutableStateFlow(ChartMode.PRICE)
+    val chartMode: StateFlow<ChartMode> = _chartMode.asStateFlow()
+
     init {
         // Iniciar la carga de datos
         loadData()
@@ -154,6 +158,10 @@ class FacturasViewModel @Inject constructor(
         _showDialog.value = false
     }
 
+    fun toggleChartMode() {
+        _chartMode.value = if (_chartMode.value == ChartMode.PRICE) ChartMode.CONSUMPTION else ChartMode.PRICE
+    }
+
     /**
      * Estados posibles de la UI de Facturas
      */
@@ -162,5 +170,13 @@ class FacturasViewModel @Inject constructor(
         data class Success(val facturas: List<Factura>) : FacturasUiState()
         data class Empty(val message: String) : FacturasUiState()
         data class Error(val message: String) : FacturasUiState()
+    }
+
+    /**
+     * Modos del gráfico
+     */
+    enum class ChartMode {
+        PRICE,
+        CONSUMPTION
     }
 }

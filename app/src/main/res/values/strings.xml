@@ -58,6 +58,10 @@
     <string name="cuota_fija">Fixed fee</string>
     <string name="plan_pago">Payment plan</string>
 
+    <!-- Invoice Charts -->
+    <string name="punta">Peak</string>
+    <string name="llenas">Full</string>
+
     <!-- Accessibility descriptions -->
     <string name="desc_boton_factura">Button to open invoice details</string>
     <string name="desc_boton_info">Information button</string>

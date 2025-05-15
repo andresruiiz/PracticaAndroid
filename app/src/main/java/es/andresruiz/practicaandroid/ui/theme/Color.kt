@@ -16,6 +16,7 @@ val Orange = Color(0xFFFD9B1A)
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
 val Red = Color(0xFFFF1500)
+val Celeste = Color(0xFFA9CAF9)
 
 val StatusPending = Red
 val StatusInfo = Color(0xFF2196F3)

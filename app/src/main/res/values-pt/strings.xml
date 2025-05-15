@@ -58,6 +58,10 @@
     <string name="cuota_fija">Parcela fixa</string>
     <string name="plan_pago">Plano de pagamento</string>
 
+    <!-- Gráficos de faturas -->
+    <string name="punta">Ponta</string>
+    <string name="llenas">Cheias</string>
+
     <!-- Descrições de acessibilidade -->
     <string name="desc_boton_factura">Botão para abrir os detalhes da fatura</string>
     <string name="desc_boton_info">Botão de informação</string>

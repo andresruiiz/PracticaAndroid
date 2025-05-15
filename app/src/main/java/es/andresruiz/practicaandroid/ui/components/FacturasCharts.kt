@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.material3.SwitchDefaults
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -36,6 +37,7 @@ import ir.ehsannarmani.compose_charts.models.DotProperties
 import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.GridProperties
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
+import ir.ehsannarmani.compose_charts.models.IndicatorCount
 import ir.ehsannarmani.compose_charts.models.IndicatorPosition
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Line
@@ -168,7 +170,8 @@ fun PriceLineChart(chartData: List<Pair<String, Double>>) {
                 color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Medium
-            )
+            ),
+            labels = chartData.map { it.first.replaceFirstChar { c -> c.uppercase() } }
         ),
         // Configuración del indicador horizontal
         indicatorProperties = HorizontalIndicatorProperties(
@@ -178,7 +181,13 @@ fun PriceLineChart(chartData: List<Pair<String, Double>>) {
                 color = MaterialTheme.colorScheme.onSurface
             ),
             padding = 16.dp,
-            position = IndicatorPosition.Horizontal.End
+            position = IndicatorPosition.Horizontal.End,
+            count = IndicatorCount.CountBased(
+                count = 3
+            ),
+            contentBuilder = {
+                "%.0f €".format(it)
+            }
         ),
         textMeasurer = textMeasurer)
 }
@@ -186,7 +195,7 @@ fun PriceLineChart(chartData: List<Pair<String, Double>>) {
 @Composable
 fun ConsumptionBarChart(consumptionData: List<Triple<String, Double, Double>>) {
     val primaryColor = MaterialTheme.colorScheme.primary
-    val celesteColor = Color(0xFF64B5F6) // Azul celeste para "llenas" (a mano por ahora)
+    val celesteColor = Color(0xFFA9CAF9) // Azul celeste para "llenas" (a mano por ahora)
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -200,18 +209,21 @@ fun ConsumptionBarChart(consumptionData: List<Triple<String, Double, Double>>) {
                 .padding(horizontal = 8.dp),
             data = remember {
                 consumptionData.map { data ->
+                    val total = data.second + data.third
+                    val puntaPorc = if (total > 0) data.second / total else 0.0
+
                     Bars(
                         label = data.first,
                         values = listOf(
                             Bars.Data(
-                                label = "Punta",
-                                value = data.second,
-                                color = SolidColor(primaryColor)
-                            ),
-                            Bars.Data(
-                                label = "Llenas",
-                                value = data.third,
-                                color = SolidColor(celesteColor)
+                                label = "Total",
+                                value = total,
+                                color = Brush.verticalGradient(
+                                    0f to celesteColor,
+                                    puntaPorc.toFloat() to celesteColor,
+                                    puntaPorc.toFloat() to primaryColor,
+                                    1f to primaryColor
+                                )
                             )
                         )
                     )
@@ -236,7 +248,13 @@ fun ConsumptionBarChart(consumptionData: List<Triple<String, Double, Double>>) {
                     color = MaterialTheme.colorScheme.onSurface
                 ),
                 padding = 16.dp,
-                position = IndicatorPosition.Horizontal.End
+                position = IndicatorPosition.Horizontal.End,
+                count = IndicatorCount.CountBased(
+                    count = 3
+                ),
+                contentBuilder = {
+                    "%.0f kWh".format(it)
+                }
             ),
             barProperties = BarProperties(
                 spacing = 4.dp
@@ -244,8 +262,7 @@ fun ConsumptionBarChart(consumptionData: List<Triple<String, Double, Double>>) {
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessLow
-            ),
-            maxValue = consumptionData.map { it.second + it.third }.maxOrNull()?.plus(5.0) ?: 100.0,
+            )
         )
     }
 }

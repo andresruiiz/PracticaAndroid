@@ -29,6 +29,8 @@ class NetworkFacturasRepository(
                 Factura(
                     descEstado = entity.descEstado,
                     importeOrdenacion = entity.importeOrdenacion,
+                    consumoPunta = entity.consumoPunta,
+                    consumoLlenas = entity.consumoLlenas,
                     fecha = entity.fecha
                 )
             }
@@ -42,6 +44,8 @@ class NetworkFacturasRepository(
             FacturaEntity(
                 descEstado = it.descEstado,
                 importeOrdenacion = it.importeOrdenacion,
+                consumoPunta = it.consumoPunta,
+                consumoLlenas = it.consumoLlenas,
                 fecha = it.fecha
             )
         }
